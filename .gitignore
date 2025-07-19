@@ -1,0 +1,28 @@
+# Binaries for programs and plugins
+main
+buy.php
+*.exe
+*.exe~
+*.so
+*.dylib
+*.dll
+.git
+php
+info.json
+composer.phar
+
+# Ignore binary output folders
+bin/
+
+# Ignore common editor/system specific metadata
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# ENV
+.env
+
+# vweb and database
+*.db
+*.js
