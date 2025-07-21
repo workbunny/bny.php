@@ -12,30 +12,30 @@ pub fn run() ! {
 		println(term.yellow('安装指令:'))
 		println('  intg add [主键]\n')
 		return
-	} 
-	
+	}
+
 	if !info.composer {
 		println(term.dim('安装composer...'))
 		download()!
 	}
-	phar := base.app_path() + "/composer.phar"
-	mut ext := ""
-	if info.os == "windows" {
-		ext = ".exe"
+	phar := base.app_path() + os.path_separator + 'composer.phar'
+	mut ext := ''
+	if info.os == 'windows' {
+		ext = '.exe'
 	}
-	cmdpath := info.php_list[info.php].path + "/php" + ext
+	cmdpath := info.php_list[info.php].path + os.path_separator + 'php' + ext
 	mut cmdargs := [phar]
 	mut args := base.get_args()
 	args.delete(0)
 	for i in 0 .. args.len {
 		cmdargs << args[i]
 	}
-	println("")
+	println('')
 	os.execvp(cmdpath, cmdargs)!
 }
 
 fn download() ! {
-	phar := base.app_path() + "/composer.phar"
+	phar := base.app_path() + os.path_separator + 'composer.phar'
 	mut info := base.get_info()!
 	http.download_file(info.composer_href, phar)!
 	info.composer = true

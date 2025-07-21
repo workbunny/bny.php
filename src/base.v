@@ -81,7 +81,7 @@ pub fn get_info() !Info {
 		composer_href: 'https://getcomposer.org/download/latest-stable/composer.phar'
 	}
 	// 文件路径
-	path := app_path() + '/info.json'
+	path := app_path() + os.path_separator + 'info.json'
 	//判断文件是否存在
 	if os.is_file(path) {
 		mut file := os.read_file(path)!
@@ -101,7 +101,7 @@ pub fn get_info() !Info {
  */
 pub fn set_info(info Info) ! {
 	mut file := json.encode(info)
-	os.write_file(app_path() + '/info.json', file)!
+	os.write_file(app_path() + os.path_separator + 'info.json', file)!
 }
 
 /**
@@ -217,6 +217,44 @@ fn preg_match_id(re regex.RE, text string, id int) []string {
 		str << str_text[lists[id].start..lists[id].end]
 		str_text = text[start + lists[id].end..end]
 		start = start + lists[id].end
+	}
+	return str
+}
+
+/**
+ * 获取文件包括扩展名
+ *
+ * @param string path 路径
+ * @return string
+ */
+pub fn file_name_ext(path string) string {
+	str_path := path
+		.replace('/', os.path_separator)
+		.replace('\\', os.path_separator)
+	arr := str_path.split(os.path_separator)
+	str := if arr[arr.len - 1] == '' {
+		arr[arr.len - 2]
+	} else {
+		arr[arr.len - 1]
+	}
+	return str
+}
+
+/**
+ * 获取文件名
+ *
+ * @param string path 路径
+ * @return string
+ */
+pub fn file_name(path string) string {
+	mut str := file_name_ext(path)
+	mut name := str.split('.')
+	if name.len == 1 {
+		str = name[0]
+	} else if name[name.len - 2] == '' {
+		str = '.' + name[name.len - 1]
+	} else {
+		str = name[name.len - 2]
 	}
 	return str
 }

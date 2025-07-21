@@ -9,7 +9,7 @@ import php
 import compile
 
 fn main() {
-
+	
 	info := base.get_info()!
 
 	args_main := base.get_args()
