@@ -24,14 +24,15 @@ pub fn run() ! {
 		ext = '.exe'
 	}
 	cmdpath := info.php_list[info.php].path + os.path_separator + 'php' + ext
-	mut cmdargs := [phar]
+	mut cmdargs := []string{}
+	cmdargs << phar
 	mut args := base.get_args()
 	args.delete(0)
-	for i in 0 .. args.len {
-		cmdargs << args[i]
-	}
-	println('')
-	os.execvp(cmdpath, cmdargs)!
+	cmdargs << args
+	mut process := os.new_process(cmdpath)
+	process.set_args(cmdargs)
+	process.run()
+	process.wait()
 }
 
 fn download() ! {

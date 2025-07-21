@@ -17,12 +17,10 @@ pub fn run() ! {
 		ext = '.exe'
 	}
 	cmdpath := info.php_list[info.php].path + os.path_separator + 'php' + ext
-	mut cmdargs := []string{}
+	mut process := os.new_process(cmdpath)
 	mut args := base.get_args()
 	args.delete(0)
-	for i in 0 .. args.len {
-		cmdargs << args[i]
-	}
-	println('')
-	os.execvp(cmdpath, cmdargs)!
+	process.set_args(args)
+	process.run()
+	process.wait()
 }
