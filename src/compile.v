@@ -38,15 +38,15 @@ pub fn run() ! {
  */
 fn build(file string) ! {
 	info := base.get_info()!
-	if file != '.' && !os.is_file(file) {
-		println(term.red('文件不存在'))
-		return
-	}
 	// 编译文件
 	file_path := if file == '.' {
 		os.abs_path('./index.php')
 	} else {
 		os.abs_path(file)
+	}
+	if file_path != '.' && !os.is_file(file_path) {
+		println(term.red('没有目标文件'))
+		return
 	}
 	// 是否项目
 	if_project := if file == '.' { true } else { false }
