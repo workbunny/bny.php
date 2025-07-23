@@ -1,119 +1,96 @@
 module compile
 
-import base
-import lanzou
 import os
-import term
-import net.http
-import compress.szip
+import base
 import time
+import php
 
-pub fn run() ! {
-	info := base.get_info()!
-	evb_path := base.app_path() + os.path_separator + 'enigmavbconsole.exe'
-	base.app_path()
-	if info.os == 'windows' {
-		if !os.is_file(evb_path) {
-			download_evb()!
-		}
+/**
+ * 获取evb文件路径
+ *
+ * @return !string
+ */
+fn get_evbfile() !string {
+
+	// evb文件名称
+	name := time.now().custom_format('YYMDHms')
+
+	// evb文件路径
+	evb_file := base.path_add(base.app_path(), 'log', name + '.evb')
+	// evb文件内容
+	body := evb_body()!
+	// 保存文件
+	os.write_file(evb_file, body)!
+
+	if !os.is_file(evb_file) {
+		panic('evb文件创建失败')
 	}
-	if info.php < 0 {
-		println(term.red('请先安装php'))
-		return
-	}
-	mut args := base.get_args()
-	args.delete(0)
-	if args.len == 0 || args[0] == '-h' {
-		help()
-	} else {
-		build(args[0])!
-	}
+	return evb_file
 }
 
 /**
- * 编译文件
+ * 编译
  *
- * @param file string 目标文件
  * @return !void
  */
-fn build(file string) ! {
-	info := base.get_info()!
-	// 编译文件
-	file_path := if file == '.' {
-		os.abs_path('./index.php')
-	} else {
-		os.abs_path(file)
-	}
-	if file_path != '.' && !os.is_file(file_path) {
-		println(term.red('没有目标文件'))
-		return
-	}
-	// 是否项目
-	if_project := if file == '.' { true } else { false }
-	ext := if info.os == 'windows' { '.exe' } else { '' }
-	// 导出文件
-	outfile_path := os.dir(file_path) + if get_outfile() != '' {
-		os.path_separator + os.base(get_outfile()) + ext
-	} else {
-		os.path_separator + os.file_name(file_path).replace(os.file_ext(file_path), '') + ext
-	}
-	// micro文件
-	micro_path := if info.os == 'windows' && is_win32() {
-		info.php_list[info.php].path + os.path_separator + 'micro_win32.sfx'
-	} else {
-		info.php_list[info.php].path + os.path_separator + 'micro.sfx'
-	}
-	// 开始编译
-	println(term.green('开始编译...'))
-	command := if info.os == 'windows' {
-		'copy /b "${micro_path}" + "${file_path}" "${outfile_path}"'
-	} else {
-		'cat ${micro_path} "${file_path}" > "${outfile_path}"'
-	}
-	result := os.execute(command)
-	if result.exit_code > 1 {
-		println(term.red('编译失败'))
-		return
-	}
-	if if_project && info.os == 'windows' {
-		win_project(outfile_path)!
-	}
-	os.chmod(outfile_path, 755)!
-	println(term.green('编译成功'))
-}
-
-/**
- * 项目处理
- *
- * @param file string 目标文件
- * @return !void
- */
-fn win_project(file string) ! {
-	if !os.is_dir(base.app_path() + os.path_separator + 'log') {
-		os.mkdir(base.app_path() + os.path_separator + 'log', os.MkdirParams{})!
-	}
-	out_file := os.dir(file) + os.path_separator + 'evbfile.exe'
-	evb_file := base.app_path() + os.path_separator + 'log' + os.path_separator +
-		time.now().custom_format('YYMDHms') + '.evb'
-	os.write_file(evb_file, get_evb_body(file, out_file)!)!
-	evb_path := base.app_path() + os.path_separator + 'enigmavbconsole.exe'
-
-	mut process := os.new_process(evb_path)
+pub fn evb_compile() ! {
+	// 入口文件路径
+	impfile := get_impfile()!
+	// php文件路径
+	php_path := php.get_php_path()!
+	// php 文件名称
+	php_name := base.file_name(php_path)
+	ext := if os.user_os() == 'windows' { '.exe' } else { '' }
+	// 新的php文件路径
+	new_php_path := base.path_add(os.dir(impfile), php_name + ext)
+	// 复制文件
+	os.cp_all(php_path, new_php_path, true)!
+	dl := Download{}
+	// evb编译文件路径
+	evb_file := get_evbfile()!
+	// evb执行文件路径
+	evb_exe := dl.evb.path
+	// 编译
+	mut process := os.new_process(evb_exe)
 	process.set_args([evb_file])
 	process.run()
+	// 等待编译完成
 	process.wait()
-	name := base.file_name(file)
-	os.rm(file)!
-	os.rename(out_file, os.dir(file) + os.path_separator + name + '.exe')!
+	// 删除新的php文件路径
+	os.rm(new_php_path)!
 }
 
-fn get_evb_body(file string, outfile string) !string {
-	file_dir := os.dir(file)
+/**
+ * 获取编译文件路径
+ *
+ * @return !string
+ */
+fn get_mainfile() !string {
+	dl := Download{}
+	mainfile := if is_term() {
+		dl.cli.path
+	} else {
+		dl.win32.path
+	}
+	return mainfile
+}
 
+/**
+ * 获取evb文件内容
+ *
+ * @return !string
+ */
+fn evb_body() !string {
+	mainfile := get_mainfile()!
+	// 入口文件目录
+	impdir := get_impdir()!
+	// 导出文件路径
+	outfile := get_outfile()!
+	evbglob := evb_glob(impdir)!
 	mut body := []string{}
 	body << '<?xml version="1.0" encoding="windows-1252"?>'
 	body << '<>'
-	body << '  <InputFile>${file}</InputFile>'
+	body << '  <InputFile>${mainfile}</InputFile>'
 	body << '  <OutputFile>${outfile}</OutputFile>'
 	body << '  <Files>'
 	body << '    <Enabled>True</Enabled>'
@@ -128,7 +105,7 @@ fn get_evb_body(file string, outfile string) !string {
 	body << '        <OverwriteAttributes>False</OverwriteAttributes>'
 	body << '        <HideFromDialogs>0</HideFromDialogs>'
 	body << '        <Files>'
-	body << evb_glob(file_dir)!
+	body << evbglob
 	body << '        </Files>'
 	body << '      </File>'
 	body << '    </Files>'
@@ -201,11 +178,14 @@ fn get_evb_body(file string, outfile string) !string {
 }
 
 fn evb_glob(path string) ![]string {
+	// 入口文件目录
 	mut str := []string{}
 	arr := os.glob(path + '/*')!
+	outfile := get_outfile()!
 	for i in arr {
-		file_path := path + os.path_separator + i
+		file_path := base.path_add(path, i)
 		name := base.file_name_ext(file_path)
+
 		// 过滤.git目录
 		if file_path.contains('.git') && file_path[file_path.len - 5..file_path.len] != '.git' {
 			continue
@@ -214,6 +194,10 @@ fn evb_glob(path string) ![]string {
 			continue
 		}
 		if file_path.contains('test') && file_path[file_path.len - 4..file_path.len] != 'test' {
+			continue
+		}
+		// 过滤输出文件
+		if file_path == outfile {
 			continue
 		}
 		if os.is_dir(file_path) {
@@ -244,76 +228,4 @@ fn evb_glob(path string) ![]string {
 		}
 	}
 	return str
-}
-
-/**
- * 获取输出文件名
- *
- * @return string
- */
-fn get_outfile() string {
-	mut args := base.get_args()
-	args.delete(0)
-	mut out_file := ''
-	for arg in args {
-		if arg.contains('-outfile=') {
-			out_file = arg.replace('-outfile=', '')
-			break
-		}
-	}
-	return out_file
-}
-
-/**
- * 判断是否为win32程序
- *
- * @return bool
- */
-fn is_win32() bool {
-	mut args := base.get_args()
-	args.delete(0)
-	mut res := false
-	for arg in args {
-		if arg == '-win32' {
-			res = true
-			break
-		}
-	}
-	return res
-}
-
-/**
- * 下载 Enigmavbconsole.exe
- *
- * @return void
- */
-fn download_evb() ! {
-	println(term.dim('安装相关依赖...'))
-	url := lanzou.download('ixPav310im7c')!
-	http.download_file(url, base.app_path() + '/evb.zip')!
-	szip.extract_zip_to_dir(base.app_path() + '/evb.zip', base.app_path())!
-	os.rm(base.app_path() + '/evb.zip')!
-}
-
-fn help() {
-	mut arr := []string{}
-	arr << term.yellow('用法:')
-	arr << ''
-	arr << term.green('intg compile ') + term.blue('[目标] <指令>')
-	arr << ''
-	arr << term.yellow('目标:')
-	arr << ''
-	arr << term.blue('  [file]                     ') + '编译php/phar文件'
-	arr << term.blue('  -h                         ') + '编译目录下所有文件'
-	arr << ''
-	arr << term.yellow('指令:')
-	arr << ''
-	arr << term.blue('  -win32                     ') + '编译为GUI程序,适用于win平台'
-	arr << term.blue('  -outfile=[name]            ') + '编译为指定文件名'
-	arr << ''
-	arr << term.yellow('示例:')
-	arr << ''
-	arr << term.green('  intg compile ') + term.blue('test.php')
-	arr << term.green('  intg compile ') + term.blue('test.phar')
-	println(arr.join('\n'))
 }

@@ -117,14 +117,14 @@ pub fn download(id string) !string {
 	configs := Configs{}
 	// 获取下载的页面链接
 	page := http.get_text(configs.href + '${id}')
-	time.sleep(1000000)
+	time.sleep(1000000000)
 	page_doc := html.parse(page)
 	mut page_url := page_doc
 		.get_tags(name: 'body')[0]
 		.get_tags('iframe')[0].attributes['src']
 	// 获取下载链接
 	file_k := http.get_text(configs.href + page_url)
-	time.sleep(1000000)
+	time.sleep(1000000000)
 	file_doc := html.parse(file_k)
 	file_script := file_doc
 		.get_tags(name: 'body')[0]
@@ -155,7 +155,7 @@ pub fn download(id string) !string {
 		header:     http_post_header
 		data:       'action=downprocess&websignkey=${ajaxdata}&signs=${ajaxdata}&sign=${wp_sign}&websign=2&kd=1&ves=1'
 	}
-	time.sleep(1000000)
+	time.sleep(1000000000)
 	resp := http_post.do()!
 	if resp.status_code != 200 {
 		panic('获取文件下载地址失败01')
@@ -191,7 +191,7 @@ pub fn download(id string) !string {
 	download_get.add_custom_header('sec-ch-ua-mobile', '?0')!
 	download_get.add_custom_header('sec-ch-ua-platform', '"Windows"')!
 	// println(download_get)
-	time.sleep(1000000)
+	time.sleep(1000000000)
 	download_resp := download_get.do()!
 	if download_resp.status_code != 302 {
 		panic('获取文件下载地址失败03')

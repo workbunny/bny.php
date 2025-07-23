@@ -7,6 +7,7 @@ import add
 import composer
 import php
 import compile
+import os
 
 fn main() {
 	
@@ -44,6 +45,22 @@ fn main() {
 			else {
 				base.help()!
 			}
+		}
+	}
+}
+
+/**
+ * 清理
+ *
+ * @return !void
+ */
+fn cleanup() ! {
+	// 入口文件路径
+	impfile := compile.get_impfile()!
+	if os.user_os() == 'windows' {
+		phpfile := base.path_add(os.dir(impfile),'php.exe')
+		if os.is_file(phpfile) {
+			os.rm(phpfile)!
 		}
 	}
 }

@@ -15,7 +15,6 @@ pub mut:
 
 pub struct Info {
 pub mut:
-	os            string
 	version       string = 'v0.0.1'
 	php           int    = -1
 	php_list      []Phplist
@@ -76,12 +75,11 @@ pub fn get_info() !Info {
 	}
 
 	mut info := Info{
-		os:            os.user_os()
 		php_href:      php_href
 		composer_href: 'https://getcomposer.org/download/latest-stable/composer.phar'
 	}
 	// 文件路径
-	path := app_path() + os.path_separator + 'info.json'
+	path := path_add(app_path(), 'info.json')
 	//判断文件是否存在
 	if os.is_file(path) {
 		mut file := os.read_file(path)!
@@ -101,7 +99,7 @@ pub fn get_info() !Info {
  */
 pub fn set_info(info Info) ! {
 	mut file := json.encode(info)
-	os.write_file(app_path() + os.path_separator + 'info.json', file)!
+	os.write_file(path_add(app_path(), 'info.json'), file)!
 }
 
 /**
@@ -255,6 +253,24 @@ pub fn file_name(path string) string {
 		str = '.' + name[name.len - 1]
 	} else {
 		str = name[name.len - 2]
+	}
+	return str
+}
+
+/**
+ * 路径添加
+ *
+ * @param string ...path 路径
+ * @return string
+ */
+pub fn path_add(path ...string) string {
+	mut str := ''
+	for k,v in path {
+		if k > 0 {
+			str += os.path_separator + v
+		}else {
+			str += v
+		}
 	}
 	return str
 }

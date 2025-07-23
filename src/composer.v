@@ -18,12 +18,12 @@ pub fn run() ! {
 		println(term.dim('安装composer...'))
 		download()!
 	}
-	phar := base.app_path() + os.path_separator + 'composer.phar'
+	phar := base.path_add(base.app_path(), 'composer.phar')
 	mut ext := ''
-	if info.os == 'windows' {
+	if os.user_os() == 'windows' {
 		ext = '.exe'
 	}
-	cmdpath := info.php_list[info.php].path + os.path_separator + 'php' + ext
+	cmdpath := base.path_add(info.php_list[info.php].path, 'php' + ext)
 	mut cmdargs := []string{}
 	cmdargs << phar
 	mut args := base.get_args()
@@ -36,7 +36,7 @@ pub fn run() ! {
 }
 
 fn download() ! {
-	phar := base.app_path() + os.path_separator + 'composer.phar'
+	phar := base.path_add(base.app_path(), 'composer.phar')
 	mut info := base.get_info()!
 	http.download_file(info.composer_href, phar)!
 	info.composer = true

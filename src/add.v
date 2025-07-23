@@ -9,10 +9,7 @@ import net.http
 
 pub fn run() ! {
 	mut info := base.get_info()!
-
-	if !os.is_dir(base.app_path() + os.path_separator + 'php') {
-		os.mkdir(base.app_path() + os.path_separator + 'php', os.MkdirParams{})!
-	}
+	checked()!
 	mut args := base.get_args()
 	args.delete(0)
 	if args.len == 0 {
@@ -45,24 +42,39 @@ pub fn run() ! {
 			println(term.dim('正在安装...'))
 			url := lanzou.download(id)!
 			// os.write_file('./php/' + file_name, content)!
-			http.download_file(url, base.app_path() + os.path_separator + 'php' +
-				os.path_separator + file_name)!
-			szip.extract_zip_to_dir(base.app_path() + os.path_separator + 'php' +
-				os.path_separator + file_name, base.app_path() + os.path_separator + 'php')!
+			http.download_file(url, base.path_add(base.app_path(), 'php' + os.path_separator + file_name))!
+			szip.extract_zip_to_dir(base.path_add(base.app_path(), 'php' + os.path_separator + file_name),
+				base.path_add(base.app_path(), 'php'))!
 			info.php_list << base.Phplist{
 				id:   id
 				name: file_name.replace('.zip', '')
-				path: base.app_path() + os.path_separator + 'php' + os.path_separator +
-					file_name.replace('.zip', '')
+				path: base.path_add(base.app_path(), 'php' + os.path_separator + file_name.replace('.zip', ''))
 			}
 			info.php = info.php_list.len - 1
 			base.set_info(info)!
-			os.rm(base.app_path() + os.path_separator + 'php' + os.path_separator + file_name)!
+			os.rm(base.path_add(base.app_path(), 'php' + os.path_separator + file_name))!
 		}
 		println(term.green('添加成功!'))
 	}
 }
 
+/**
+ * 检查php目录
+ *
+ * @return !void
+ */
+fn checked() ! {
+	path := base.path_add(base.app_path(), 'php')
+	if !os.is_dir(path) {
+		os.mkdir(path, os.MkdirParams{})!
+	}
+}
+
+/**
+ * 帮助
+ *
+ * @return void
+ */
 fn help() {
 	println(term.red('\n请输入主键!\n'))
 	println(term.yellow('安装指令:'))
