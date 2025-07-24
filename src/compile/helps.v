@@ -14,7 +14,7 @@ pub fn get_impfile() ! string {
 	args := base.get_args()
 	mut arg := cmdline.option(args, 'compile', '')
 	if arg == '.' {
-		arg = './index.php'
+		arg = './main.php'
 	}
 	impfile := os.abs_path(arg)
 	if !os.is_file(impfile) {

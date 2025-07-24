@@ -3,6 +3,7 @@
 ### docker 运行
 
 ```bash
+apt install -y file
 export APPIMAGE_EXTRACT_AND_RUN=1
 ```
 

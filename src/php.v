@@ -6,10 +6,12 @@ import term
 
 pub fn run() ! {
 	checked()!
-	cmdpath := get_php_path()!
-	mut process := os.new_process(cmdpath)
+
 	mut args := base.get_args()
 	args.delete(0)
+
+	cmdpath := get_php_path()!
+	mut process := os.new_process(cmdpath)
 	process.set_args(args)
 	process.run()
 	process.wait()
@@ -37,6 +39,6 @@ pub fn checked() ! {
 		println(term.red('\n您没有安装PHP!\n'))
 		println(term.yellow('安装指令:'))
 		println('  bny add [主键]\n')
-		return
+		exit(1)
 	}
 }

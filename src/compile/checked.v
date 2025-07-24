@@ -85,7 +85,7 @@ fn linux() ! {
 	if !os.is_file(dl.appimage.path) {
 		download(dl.appimage.id, dl.appimage.path, 'appimage')!
 	}
-	if !os.is_dir(dl.runtime.path) {
+	if !os.is_file(dl.runtime.path) {
 		download(dl.runtime.id, dl.runtime.path, 'runtime')!
 	}
 }

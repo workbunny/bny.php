@@ -30,7 +30,7 @@ fn build() ! {
 	if os.user_os() == 'windows' {
 		evb_compile()!
 	} else {
-		println('未完成...')
+		appimage_build()!
 	}
 	println(term.blue('编译项目完成'))
 	outfile := get_outfile()!

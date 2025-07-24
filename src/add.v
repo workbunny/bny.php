@@ -42,17 +42,17 @@ pub fn run() ! {
 			println(term.dim('正在安装...'))
 			url := lanzou.download(id)!
 			// os.write_file('./php/' + file_name, content)!
-			http.download_file(url, base.path_add(base.app_path(), 'php' + os.path_separator + file_name))!
-			szip.extract_zip_to_dir(base.path_add(base.app_path(), 'php' + os.path_separator + file_name),
+			http.download_file(url, base.path_add(base.app_path(), 'php' , file_name))!
+			szip.extract_zip_to_dir(base.path_add(base.app_path(), 'php' , file_name),
 				base.path_add(base.app_path(), 'php'))!
 			info.php_list << base.Phplist{
 				id:   id
 				name: file_name.replace('.zip', '')
-				path: base.path_add(base.app_path(), 'php' + os.path_separator + file_name.replace('.zip', ''))
+				path: base.path_add(base.app_path(), 'php' , file_name.replace('.zip', ''))
 			}
 			info.php = info.php_list.len - 1
 			base.set_info(info)!
-			os.rm(base.path_add(base.app_path(), 'php' + os.path_separator + file_name))!
+			os.rm(base.path_add(base.app_path(), 'php' , file_name))!
 		}
 		println(term.green('添加成功!'))
 	}

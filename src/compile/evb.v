@@ -39,10 +39,9 @@ pub fn evb_compile() ! {
 	// php文件路径
 	php_path := php.get_php_path()!
 	// php 文件名称
-	php_name := base.file_name(php_path)
-	ext := if os.user_os() == 'windows' { '.exe' } else { '' }
+	php_name := base.file_name_ext(php_path)
 	// 新的php文件路径
-	new_php_path := base.path_add(os.dir(impfile), php_name + ext)
+	new_php_path := base.path_add(os.dir(impfile), php_name)
 	// 复制文件
 	os.cp_all(php_path, new_php_path, true)!
 	dl := Download{}

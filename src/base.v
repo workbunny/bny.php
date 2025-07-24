@@ -40,8 +40,7 @@ pub fn get_args() []string {
  * @return string
  */
 pub fn app_path() string {
-	args := os.args.clone()
-	return os.dir(args[0])
+	return os.dir(os.executable())
 }
 
 /**
@@ -265,12 +264,56 @@ pub fn file_name(path string) string {
  */
 pub fn path_add(path ...string) string {
 	mut str := ''
-	for k,v in path {
+	for k, v in path {
 		if k > 0 {
 			str += os.path_separator + v
-		}else {
+		} else {
 			str += v
 		}
 	}
 	return str
+}
+
+/**
+ * 递归修改权限
+ *
+ * @param string path 路径
+ * @param int mode 权限
+ * @return !void
+ */
+pub fn chmod_all(path string, mode int) ! {
+	// 判断是否文件
+	if os.is_file(path) {
+		os.chmod(path, mode)!
+	}
+	// 判断是否目录
+	if os.is_dir(path) {
+		os.chmod(path, mode)!
+		mut arr := []string{}
+		arr << os.ls(path)!
+		for i in arr {
+			//普通使用 chmod_all(path + os.path_separator + i, mode)!
+			chmod_all(path_add(path, i), mode)!
+		}
+	}
+}
+
+/**
+ * 递归删除
+ *
+ * @param string path 路径
+ * @return !void
+ */
+pub fn rm_all(path string) ! {
+	if os.is_file(path) {
+		os.rm(path)!
+	}
+	if os.is_dir(path) {
+		mut arr := []string{}
+		arr << os.ls(path)!
+		for i in arr {
+			rm_all(path_add(path, i))!
+		}
+		os.rmdir(path)!
+	}
 }
