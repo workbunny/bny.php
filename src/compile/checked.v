@@ -8,33 +8,33 @@ import term
 import compress.szip
 
 pub struct Download {
-pub mut:
+pub:
 	// windows 所需依赖
 	evb   struct {
 	pub:
 		id   string = 'ixPav310im7c'
-		path string = base.path_add(base.app_path(), 'script', 'enigmavbconsole.exe')
+		path string = base.path_add(base.Dirs{}.script, 'enigmavbconsole.exe')
 	}
 	cli   struct {
 	pub:
 		id   string = 'irs0C31mdsoh'
-		path string = base.path_add(base.app_path(), 'script', 'cli.exe')
+		path string = base.path_add(base.Dirs{}.script, 'cli.exe')
 	}
 	win32 struct {
 	pub:
 		id   string = 'ij8YQ31pca1i'
-		path string = base.path_add(base.app_path(), 'script', 'win32.exe')
+		path string = base.path_add(base.Dirs{}.script, 'win32.exe')
 	}
 	// linux 所需依赖
 	appimage struct {
 	pub:
 		id   string = 'iBMuT31mdlhi'
-		path string = base.path_add(base.app_path(), 'script', 'appimagetool-x86_64.AppImage')
+		path string = base.path_add(base.Dirs{}.script, 'appimagetool-x86_64.AppImage')
 	}
 	runtime  struct {
 	pub:
 		id   string = 'is44m31mdl9a'
-		path string = base.path_add(base.app_path(), 'script', 'runtime-x86_64')
+		path string = base.path_add(base.Dirs{}.script, 'runtime-x86_64')
 	}
 }
 
@@ -44,12 +44,11 @@ pub mut:
  * @return !void
  */
 pub fn checked() ! {
-	
-	if !os.is_dir(base.path_add(base.app_path(),'script')) {
-		os.mkdir(base.path_add(base.app_path(),'script'), os.MkdirParams{})!
+	if !os.is_dir(base.Dirs{}.script) {
+		os.mkdir(base.Dirs{}.script, os.MkdirParams{})!
 	}
-	if !os.is_dir(base.path_add(base.app_path(),'log')) {
-		os.mkdir(base.path_add(base.app_path(),'log'), os.MkdirParams{})!
+	if !os.is_dir(base.Dirs{}.log) {
+		os.mkdir(base.Dirs{}.log, os.MkdirParams{})!
 	}
 	if os.user_os() == 'windows' {
 		windows()!
@@ -64,17 +63,14 @@ pub fn checked() ! {
  * @return !void
  */
 fn windows() ! {
-
-	dl := Download{}
-
-	if !os.is_file(dl.evb.path) {
-		download(dl.evb.id, dl.evb.path, 'enigmavbconsole')!
+	if !os.is_file(Download{}.evb.path) {
+		download(Download{}.evb.id, Download{}.evb.path, 'enigmavbconsole')!
 	}
-	if !os.is_file(dl.cli.path) {
-		download(dl.cli.id, dl.cli.path, 'cli')!
+	if !os.is_file(Download{}.cli.path) {
+		download(Download{}.cli.id, Download{}.cli.path, 'cli')!
 	}
-	if !os.is_file(dl.win32.path) {
-		download(dl.win32.id, dl.win32.path, 'win32')!
+	if !os.is_file(Download{}.win32.path) {
+		download(Download{}.win32.id, Download{}.win32.path, 'win32')!
 	}
 }
 
@@ -84,12 +80,11 @@ fn windows() ! {
  * @return !void
  */
 fn linux() ! {
-	dl := Download{}
-	if !os.is_file(dl.appimage.path) {
-		download(dl.appimage.id, dl.appimage.path, 'appimage')!
+	if !os.is_file(Download{}.appimage.path) {
+		download(Download{}.appimage.id, Download{}.appimage.path, 'appimage')!
 	}
-	if !os.is_file(dl.runtime.path) {
-		download(dl.runtime.id, dl.runtime.path, 'runtime')!
+	if !os.is_file(Download{}.runtime.path) {
+		download(Download{}.runtime.id, Download{}.runtime.path, 'runtime')!
 	}
 }
 

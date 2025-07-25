@@ -11,7 +11,6 @@ import php
  * @return !string
  */
 fn get_evbfile() !string {
-
 	// evb文件名称
 	name := time.now().custom_format('YYMDHms')
 
@@ -34,16 +33,6 @@ fn get_evbfile() !string {
  * @return !void
  */
 pub fn evb_compile() ! {
-	// 入口文件路径
-	impfile := get_impfile()!
-	// php文件路径
-	php_path := php.get_php_path()!
-	// php 文件名称
-	php_name := base.file_name_ext(php_path)
-	// 新的php文件路径
-	new_php_path := base.path_add(os.dir(impfile), php_name)
-	// 复制文件
-	os.cp_all(php_path, new_php_path, true)!
 	dl := Download{}
 	// evb编译文件路径
 	evb_file := get_evbfile()!
@@ -55,8 +44,6 @@ pub fn evb_compile() ! {
 	process.run()
 	// 等待编译完成
 	process.wait()
-	// 删除新的php文件路径
-	os.rm(new_php_path)!
 }
 
 /**
@@ -85,7 +72,6 @@ fn evb_body() !string {
 	impdir := get_impdir()!
 	// 导出文件路径
 	outfile := get_outfile()!
-	evbglob := evb_glob(impdir)!
 	mut body := []string{}
 	body << '<?xml version="1.0" encoding="windows-1252"?>'
 	body << '<>'
@@ -104,7 +90,8 @@ fn evb_body() !string {
 	body << '        <OverwriteAttributes>False</OverwriteAttributes>'
 	body << '        <HideFromDialogs>0</HideFromDialogs>'
 	body << '        <Files>'
-	body << evbglob
+	body << php_evb()!
+	body << evb_glob(impdir)!
 	body << '        </Files>'
 	body << '      </File>'
 	body << '    </Files>'
@@ -174,6 +161,27 @@ fn evb_body() !string {
 	body << '  </Storage>'
 	body << '</>'
 	return body.join('\n')
+}
+
+fn php_evb() ![]string {
+	// php文件路径
+	php_path := php.get_php_path()!
+	// php 文件名称
+	php_name := base.file_name_ext(php_path)
+	mut str := []string{}
+	str << '<File>'
+	str << '  <Type>2</Type>'
+	str << '  <Name>${php_name}</Name>'
+	str << '  <File>${php_path}</File>'
+	str << '  <ActiveX>False</ActiveX>'
+	str << '  <ActiveXInstall>False</ActiveXInstall>'
+	str << '  <Action>0</Action>'
+	str << '  <OverwriteDateTime>False</OverwriteDateTime>'
+	str << '  <OverwriteAttributes>False</OverwriteAttributes>'
+	str << '  <PassCommandLine>False</PassCommandLine>'
+	str << '  <HideFromDialogs>0</HideFromDialogs>'
+	str << '</File>'
+	return str
 }
 
 fn evb_glob(path string) ![]string {

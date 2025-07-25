@@ -83,13 +83,13 @@ pub fn help() {
 	arr << ''
 	arr << term.yellow('目标:')
 	arr << ''
-	arr << term.blue('  .                          ') + '编译项目'
-	arr << term.blue('  [file]                     ') + '入口文件'
+	arr << term.blue('  .                          ') + '编译当前目录'
+	arr << term.blue('  [path]                     ') + '根据入口文件编译'
 	arr << term.blue('  -h                         ') + '帮助查看'
 	arr << ''
 	arr << term.yellow('指令:')
 	arr << ''
-	arr << term.blue('  -noterm                     ') + '不使用终端'
+	arr << term.blue('  -noterm                     ') + '不显示终端窗口'
 	arr << term.blue('  -o [name]                   ') + '编译为指定文件名'
 	arr << ''
 	arr << term.yellow('示例:')

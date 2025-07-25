@@ -4,41 +4,32 @@ import base
 import term
 import net.http
 import os
+import php
 
 pub fn run() ! {
-	info := base.get_info()!
-	if info.php < 0 {
-		println(term.red('\n您没有安装PHP!\n'))
-		println(term.yellow('安装指令:'))
-		println('  intg add [主键]\n')
-		return
-	}
-
-	if !info.composer {
+	cmdpath := php.get_php_path()!
+	// composer.phar
+	if !os.is_file(base.Composer{}.path) {
 		println(term.dim('安装composer...'))
 		download()!
 	}
-	phar := base.path_add(base.app_path(), 'composer.phar')
-	mut ext := ''
-	if os.user_os() == 'windows' {
-		ext = '.exe'
-	}
-	cmdpath := base.path_add(info.php_list[info.php].path, 'php' + ext)
-	mut cmdargs := []string{}
-	cmdargs << phar
 	mut args := base.get_args()
-	args.delete(0)
-	cmdargs << args
+	args[0] = base.Composer{}.path
 	mut process := os.new_process(cmdpath)
-	process.set_args(cmdargs)
+	process.set_args(args)
 	process.run()
 	process.wait()
 }
 
+/**
+ * 下载composer.phar
+ *
+ * @return !void
+ */
 fn download() ! {
-	phar := base.path_add(base.app_path(), 'composer.phar')
-	mut info := base.get_info()!
-	http.download_file(info.composer_href, phar)!
-	info.composer = true
-	base.set_info(info)!
+	http.download_file(base.Composer{}.url, base.Composer{}.path)!
+	// 设置文件权限
+	if os.is_file(base.Composer{}.path) {
+		os.chmod(base.Composer{}.path, 0o777)!
+	}
 }

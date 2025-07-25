@@ -8,25 +8,36 @@ import composer
 import php
 import compile
 import os
+import clean
 
+/**
+ * 初始化
+ *
+ * @return void
+ */
 fn init() {
 	php_dir := base.path_add(base.app_path(), 'php')
+	log_dir := base.path_add(base.app_path(), 'log')
 	script_dir := base.path_add(base.app_path(), 'script')
-	composer_file := base.path_add(base.app_path(), 'composer.phar')
 	mut arr := []string{}
 	arr << php_dir
 	arr << script_dir
-	arr << composer_file
+	arr << log_dir
+	// 创建文件夹
 	for i in arr {
 		if os.is_dir(i) {
-			base.chmod_all(i, 0o755) or { println('chmod ${i} failed') }
-		}
-		if os.is_file(i) {
-			os.chmod(i, 0o755) or { println('chmod ${i} failed') }
+			base.chmod_all(i, 0o777) or { println('chmod ${i} failed') }
+		} else {
+			os.mkdir(i, os.MkdirParams{}) or { println('Failed to create the "${i}" directory') }
 		}
 	}
 }
 
+/**
+ * 主函数
+ *
+ * @return void
+ */
 fn main() {
 	info := base.get_info()!
 
@@ -53,6 +64,9 @@ fn main() {
 			'search' {
 				search.run()!
 			}
+			'clean' {
+				clean.run()!
+			}
 			'-h' {
 				base.help()!
 			}
@@ -64,24 +78,4 @@ fn main() {
 			}
 		}
 	}
-}
-
-/**
- * 清理
- *
- * @return !void
- */
-fn cleanup() ! {
-	impdir := compile.get_impdir()!
-	ext := if os.user_os() == 'windows' {
-		'.exe'
-	} else {
-		''
-	}
-	phpfile := base.path_add(impdir, 'php' + ext)
-	if os.is_file(phpfile) {
-		os.rm(phpfile)!
-	}
-	apprun_dir := base.path_add(impdir,'AppRun')
-	base.rm_all(apprun_dir)!
 }

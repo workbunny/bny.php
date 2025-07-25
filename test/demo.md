@@ -1,10 +1,10 @@
 # AppImage
 
-### docker 运行
+### docker 和 Linux 要求
 
 ```bash
-apt install -y file
-export APPIMAGE_EXTRACT_AND_RUN=1
+apt install -y file # linux 和 docker
+export APPIMAGE_EXTRACT_AND_RUN=1 # docker
 ```
 
 ### 目录结构

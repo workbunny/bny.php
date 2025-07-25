@@ -15,12 +15,26 @@ pub mut:
 
 pub struct Info {
 pub mut:
-	version       string = 'v0.0.1'
-	php           int    = -1
-	php_list      []Phplist
-	php_href      string
-	composer      bool
-	composer_href string
+	version  string = 'v0.0.1'
+	php      int    = -1
+	php_list []Phplist
+	php_href string = if os.user_os() == 'windows' {
+		'https://kingbes.lanzoub.com/b00668121g?pwd=1f0b'
+	} else {
+		'https://kingbes.lanzoub.com/b00668140h?pwd=bxjp'
+	}
+}
+
+pub struct Composer {
+pub:
+	path string = path_add(app_path(), 'composer.phar')
+	url  string = 'https://getcomposer.org/download/latest-stable/composer.phar'
+}
+
+pub struct Dirs {
+pub:
+	script string = path_add(app_path(), 'script')
+	log    string = path_add(app_path(), 'log')
 }
 
 /**
@@ -67,16 +81,7 @@ fn get_logo() []string {
  * @return !Info
  */
 pub fn get_info() !Info {
-	mut php_href := if os.user_os() == 'windows' {
-		'https://kingbes.lanzoub.com/b00668121g?pwd=1f0b'
-	} else {
-		'https://kingbes.lanzoub.com/b00668140h?pwd=bxjp'
-	}
-
-	mut info := Info{
-		php_href:      php_href
-		composer_href: 'https://getcomposer.org/download/latest-stable/composer.phar'
-	}
+	mut info := Info{}
 	// 文件路径
 	path := path_add(app_path(), 'info.json')
 	//判断文件是否存在
@@ -115,7 +120,7 @@ pub fn help() ! {
 	version += term.green('PHP: ')
 	version += if info.php > -1 { '已安装 ' } else { term.red('未安装 ') }
 	version += term.green('Composer: ')
-	version += if info.composer { '已安装 ' } else { term.red('未安装 ') }
+	version += if os.is_file(Composer{}.path) { '已安装 ' } else { term.red('未安装 ') }
 	version += term.blue(time.unix(os.file_last_mod_unix(os.args[0])).str()) + '\n'
 	str << version
 	// 用法
@@ -130,6 +135,7 @@ pub fn help() ! {
 	commands += term.green('  add                   ') + '添加php版本\n'
 	commands += term.green('  search                ') + '搜索php版本\n'
 	commands += term.green('  lists                 ') + '查看已安装的php\n'
+	commands += term.green('  clean                 ') + '清理缓存垃圾\n'
 	commands += '\n'
 	str << commands
 	// 选项
@@ -292,7 +298,6 @@ pub fn chmod_all(path string, mode int) ! {
 		mut arr := []string{}
 		arr << os.ls(path)!
 		for i in arr {
-			//普通使用 chmod_all(path + os.path_separator + i, mode)!
 			chmod_all(path_add(path, i), mode)!
 		}
 	}
