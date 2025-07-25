@@ -84,8 +84,8 @@ pub fn help() {
 	arr << term.yellow('目标:')
 	arr << ''
 	arr << term.blue('  .                          ') + '编译项目'
-	arr << term.blue('  [file]                     ') + '编译php/phar文件'
-	arr << term.blue('  -h                         ') + '编译目录下所有文件'
+	arr << term.blue('  [file]                     ') + '入口文件'
+	arr << term.blue('  -h                         ') + '帮助查看'
 	arr << ''
 	arr << term.yellow('指令:')
 	arr << ''
@@ -94,7 +94,7 @@ pub fn help() {
 	arr << ''
 	arr << term.yellow('示例:')
 	arr << ''
-	arr << term.green('  intg compile ') + term.blue('test.php')
-	arr << term.green('  intg compile ') + term.blue('test.phar')
+	arr << term.green('  intg compile ') + term.blue('.')
+	arr << term.green('  intg compile ') + term.blue('index.php')
 	println(arr.join('\n'))
 }
