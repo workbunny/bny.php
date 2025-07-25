@@ -14,11 +14,14 @@ pub fn get_impfile() ! string {
 	args := base.get_args()
 	mut arg := cmdline.option(args, 'compile', '')
 	if arg == '.' {
-		arg = './main.php'
+		arg = './index.php'
 	}
 	impfile := os.abs_path(arg)
 	if !os.is_file(impfile) {
 		panic('没有目标文件:${impfile}')
+	}
+	if base.file_name_ext(impfile) != 'index.php' {
+		panic('入口文件必须是 index.php')
 	}
 	return impfile
 }

@@ -48,6 +48,9 @@ pub fn checked() ! {
 	if !os.is_dir(base.path_add(base.app_path(),'script')) {
 		os.mkdir(base.path_add(base.app_path(),'script'), os.MkdirParams{})!
 	}
+	if !os.is_dir(base.path_add(base.app_path(),'log')) {
+		os.mkdir(base.path_add(base.app_path(),'log'), os.MkdirParams{})!
+	}
 	if os.user_os() == 'windows' {
 		windows()!
 	} else {

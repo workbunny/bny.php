@@ -24,6 +24,7 @@ pub fn run() ! {
  */
 pub fn get_php_path() ! string {
 	info := base.get_info()!
+	checked()!
 	ext := if os.user_os() == 'windows' { '.exe' } else { '' }
 	return base.path_add(info.php_list[info.php].path, 'php' + ext)
 }
