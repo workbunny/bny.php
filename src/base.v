@@ -8,21 +8,16 @@ import regex
 
 pub struct Phplist {
 pub mut:
-	id   string
 	path string
 	name string
 }
 
 pub struct Info {
 pub mut:
+	name     string = 'bny'
 	version  string = 'v0.0.1'
 	php      int    = -1
 	php_list []Phplist
-	php_href string = if os.user_os() == 'windows' {
-		'https://kingbes.lanzoub.com/b00668121g?pwd=1f0b'
-	} else {
-		'https://kingbes.lanzoub.com/b00668140h?pwd=bxjp'
-	}
 }
 
 pub struct Composer {

@@ -4,7 +4,10 @@ import os
 
 fn main() {
 	// index.php 文件
-	file := "./php.exe"
+	mut file := "./php"
+	if os.user_os() == 'windows' {
+		file += '.exe'
+	}
 	if !os.is_file(file) {
 		panic("The PHP parser file does not exist.")
 	}

@@ -2,10 +2,9 @@ module add
 
 import base
 import term
-import lanzou
 import os
 import compress.szip
-import net.http
+import files
 
 pub fn run() ! {
 	mut info := base.get_info()!
@@ -13,47 +12,40 @@ pub fn run() ! {
 	mut args := base.get_args()
 	args.delete(0)
 	if args.len == 0 {
-		help()
+		help()!
 	} else {
-		id := args[0]
-		mut is_lists := false
+		name := args[0]
+
 		for k, v in info.php_list {
-			if v.id == id {
-				is_lists = true
+			if v.name == name {
 				info.php = k
-				break
+				base.set_info(info)!
+				println(term.green('添加成功!'))
+				exit(1)
 			}
 		}
-		if !is_lists {
-			https := base.get_http(info.php_href)
-			lists := lanzou.lists(https[0], https[1])!
-			mut is_check := false
-			mut file_name := ''
-			for item in lists.text {
-				if item.id == id {
-					file_name = item.name_all
-					is_check = true
-					break
-				}
-			}
-			if !is_check {
-				panic('没有该主键的php版本!')
-			}
-			println(term.dim('正在安装...'))
-			url := lanzou.download(id)!
-			// os.write_file('./php/' + file_name, content)!
-			http.download_file(url, base.path_add(base.app_path(), 'php' , file_name))!
-			szip.extract_zip_to_dir(base.path_add(base.app_path(), 'php' , file_name),
-				base.path_add(base.app_path(), 'php'))!
-			info.php_list << base.Phplist{
-				id:   id
-				name: file_name.replace('.zip', '')
-				path: base.path_add(base.app_path(), 'php' , file_name.replace('.zip', ''))
-			}
-			info.php = info.php_list.len - 1
-			base.set_info(info)!
-			os.rm(base.path_add(base.app_path(), 'php' , file_name))!
+
+		println(term.dim('正在下载...'))
+		dir := base.path_add(base.app_path(), 'php')
+		path := files.path_php_cli()
+		resp := files.download(path, name + '.zip', dir)!
+		if resp.status_code != 200 {
+			println(term.red('下载失败!'))
+			exit(1)
 		}
+		println(term.dim('正在解压...'))
+		size := szip.extract_zip_to_dir(base.path_add(dir, name + '.zip'), dir)!
+		if !size {
+			println(term.red('解压失败!请重新下载!'))
+			exit(1)
+		}
+		info.php_list << base.Phplist{
+			name: name
+			path: base.path_add(base.app_path(), 'php', name)
+		}
+		info.php = info.php_list.len - 1
+		base.set_info(info)!
+		os.rm(base.path_add(dir, name + '.zip'))!
 		println(term.green('添加成功!'))
 	}
 }
@@ -73,10 +65,11 @@ fn checked() ! {
 /**
  * 帮助
  *
- * @return void
+ * @return !void
  */
-fn help() {
-	println(term.red('\n请输入主键!\n'))
+fn help() !{
+	info := base.get_info()!
+	println(term.red('\n请输入版本号!\n'))
 	println(term.yellow('安装指令:'))
-	println('  intg add [主键]\n')
+	println('  ${info.name} add [版本号]\n')
 }

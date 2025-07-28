@@ -39,7 +39,7 @@ pub fn checked() ! {
 	if info.php < 0 {
 		println(term.red('\n您没有安装PHP!\n'))
 		println(term.yellow('安装指令:'))
-		println('  bny add [主键]\n')
+		println('  ${info.name} add [版本号]\n')
 		exit(1)
 	}
 }

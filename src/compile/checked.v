@@ -1,41 +1,47 @@
 module compile
 
 import base
-import lanzou
 import os
 import net.http
 import term
 import compress.szip
 
 pub struct Download {
-pub:
+pub mut:
 	// windows 所需依赖
-	evb   struct {
-	pub:
-		id   string = 'ixPav310im7c'
-		path string = base.path_add(base.Dirs{}.script, 'enigmavbconsole.exe')
+	evb   Url = {
+		name: 'evb.zip'
+		path: '/executables'
+		file: base.path_add(base.Dirs{}.script, 'enigmavbconsole.exe')
 	}
-	cli   struct {
-	pub:
-		id   string = 'irs0C31mdsoh'
-		path string = base.path_add(base.Dirs{}.script, 'cli.exe')
+	cli   Url = {
+		name: 'cli.zip'
+		path: '/script'
+		file: base.path_add(base.Dirs{}.script, 'cli.exe')
 	}
-	win32 struct {
-	pub:
-		id   string = 'ij8YQ31pca1i'
-		path string = base.path_add(base.Dirs{}.script, 'win32.exe')
+	win32 Url = {
+		name: 'win32.zip'
+		path: '/executables'
+		file: base.path_add(base.Dirs{}.script, 'win32.exe')
 	}
 	// linux 所需依赖
-	appimage struct {
-	pub:
-		id   string = 'iBMuT31mdlhi'
-		path string = base.path_add(base.Dirs{}.script, 'appimagetool-x86_64.AppImage')
+	appimage Url = {
+		name: 'appimagetool-x86_64.zip'
+		path: '/executables'
+		file: base.path_add(base.Dirs{}.script, 'appimagetool-x86_64.AppImage')
 	}
-	runtime  struct {
-	pub:
-		id   string = 'is44m31mdl9a'
-		path string = base.path_add(base.Dirs{}.script, 'runtime-x86_64')
+	runtime  Url = {
+		name: 'runtime-x86_64.zip'
+		path: '/executables'
+		file: base.path_add(base.Dirs{}.script, 'runtime-x86_64')
 	}
+}
+
+struct Url {
+pub mut:
+	name string
+	path string
+	file string
 }
 
 /**
@@ -64,13 +70,13 @@ pub fn checked() ! {
  */
 fn windows() ! {
 	if !os.is_file(Download{}.evb.path) {
-		download(Download{}.evb.id, Download{}.evb.path, 'enigmavbconsole')!
+		download(Download{}.evb.id, Download{}.evb.path)!
 	}
 	if !os.is_file(Download{}.cli.path) {
-		download(Download{}.cli.id, Download{}.cli.path, 'cli')!
+		download(Download{}.cli.id, Download{}.cli.path)!
 	}
 	if !os.is_file(Download{}.win32.path) {
-		download(Download{}.win32.id, Download{}.win32.path, 'win32')!
+		download(Download{}.win32.id, Download{}.win32.path)!
 	}
 }
 
@@ -81,23 +87,23 @@ fn windows() ! {
  */
 fn linux() ! {
 	if !os.is_file(Download{}.appimage.path) {
-		download(Download{}.appimage.id, Download{}.appimage.path, 'appimage')!
+		download(Download{}.appimage.id, Download{}.appimage.path)!
 	}
 	if !os.is_file(Download{}.runtime.path) {
-		download(Download{}.runtime.id, Download{}.runtime.path, 'runtime')!
+		download(Download{}.runtime.id, Download{}.runtime.path)!
 	}
 }
 
 /**
  * 下载文件
  *
- * @param file string 文件枚举
+ * @param name string 文件名
  * @param path string 路径
  * @return !void
  */
-fn download(file string, path string, depname string) ! {
-	println(term.dim('安装依赖:${depname}...'))
-	// 文件名
+fn download(url Url, path string) ! {
+	println(term.dim('安装依赖...'))
+	/* // 文件名
 	name := base.file_name(path)
 	// 下载地址
 	url := lanzou.download(file)!
@@ -108,5 +114,5 @@ fn download(file string, path string, depname string) ! {
 	// 解压文件
 	szip.extract_zip_to_dir(zip_file, os.dir(path))!
 	// 删除压缩包文件
-	os.rm(zip_file)!
+	os.rm(zip_file)! */
 }

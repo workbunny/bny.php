@@ -1,29 +1,27 @@
 module search
 
-import base
-import lanzou
+import files
 import term
+import base
 
 pub fn run() ! {
-	mut info := base.get_info()!
-	http := base.get_http(info.php_href)
-	data := lanzou.lists(http[0], http[1])!
-
-	if data.zt == 1 {
+	info := base.get_info()!
+	path := files.path_php_cli()
+	data := files.search(path)!
+	if data.code == 0 {
 		println(term.yellow('\n搜索结果:\n'))
-		println(term.green('  主键              版本名        大小         类型\n'))
-		for item in data.text {
+		println(term.green('  版本号        后缀      类型      大小\n'))
+		for item in data.data {
 			mut selected := ' '
-			if info.php >= 0 && info.php_list[info.php].id == item.id {
+			if info.php >= 0 && info.php_list[info.php].name == item.name {
 				selected = term.red('※')
 			}
-			println('${selected} ${item.id}      ${item.name_all.replace('.' + item.icon,
-				'')}           ${item.size}       ${item.icon}')
+			println('${selected} ${item.name}           ${item.ext}       ${item.type}      ${item.size}')
 		}
 		println('\n')
 		println(term.yellow('安装指令:\n'))
-		println('  intg add [主键]\n')
-	} else {
+		println('  ${info.name} add [版本号]\n')
+	}else{
 		panic('获取列表失败!')
 	}
 }
