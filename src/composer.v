@@ -9,16 +9,26 @@ import php
 pub fn run() ! {
 	cmdpath := php.get_php_path()!
 	// composer.phar
-	if !os.is_file(base.Composer{}.path) {
-		println(term.dim('安装composer...'))
-		download()!
-	}
 	mut args := base.get_args()
-	args[0] = base.Composer{}.path
+	args[0] = get_composer_path()!
 	mut process := os.new_process(cmdpath)
 	process.set_args(args)
 	process.run()
 	process.wait()
+}
+
+/**
+ * 获取composer.phar路径
+ *
+ * @return !string
+ */
+pub fn get_composer_path() ! string {
+	str := base.Composer{}.path
+	if !os.is_file(base.Composer{}.path) {
+		println(term.dim('安装composer...'))
+		download()!
+	}
+	return str
 }
 
 /**

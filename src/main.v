@@ -9,6 +9,7 @@ import php
 import compile
 import os
 import clean
+import worker
 
 /**
  * 初始化
@@ -46,6 +47,9 @@ fn main() {
 		base.help()!
 	} else {
 		match args_main[0] {
+			'worker' {
+				worker.run()!
+			}
 			'php' {
 				php.run()!
 			}

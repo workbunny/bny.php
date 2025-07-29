@@ -17,6 +17,7 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 
 
 指令:
+  worker                运行服务器
   php                   运行PHP
   composer              运行Composer
   compile               编译项目

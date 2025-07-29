@@ -1,5 +1,5 @@
 {
-    "name": "bny/server",
+    "name": "bny/worker",
     "description": "bny",
     "type": "project",
     "require": {
@@ -8,7 +8,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Bny\\Server\\": "src/"
+            "Bny\\Worker\\": "src/"
         }
     },
     "minimum-stability": "dev",
