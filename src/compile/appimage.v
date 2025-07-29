@@ -50,7 +50,7 @@ fn create_project() ! {
 	apprun_desktop << '[Desktop Entry]'
 	apprun_desktop << 'Name=${main_filename}'
 	apprun_desktop << 'Type=Application'
-	apprun_desktop << 'Exec=AppRun'
+	apprun_desktop << 'Exec=AppRun --no-sandbox'
 	apprun_desktop << 'Icon=icon'
 	if is_term() {
 		apprun_desktop << 'Terminal=true'
@@ -79,15 +79,14 @@ fn appimage_compile() ! {
 	// 编译目录
 	apprun_dir := get_dir()!
 	// 编译工具
-	appimage_tool := Download{}.appimage.path
+	appimage_tool := Download.appimage.next().file
 	// 运行时
-	runtime := Download{}.runtime.path
+	runtime := Download.runtime.next().file
 	// 编译
-	// os.execute('ARCH=x86_64 ${appimage_tool} ${apprun_dir} --runtime-file ${runtime} -n ${outfile}')
-	// println('ARCH=x86_64 ${appimage_tool} ${apprun_dir} --runtime-file ${runtime} -n ${outfile} --appimage-extract-and-run')
 	mut process := os.new_process(appimage_tool)
 	process.set_args([apprun_dir, '--runtime-file', runtime, '-n', outfile ,'--appimage-extract-and-run'])
 	process.env << 'ARCH=x86_64'
+	process.env << 'APPIMAGE_EXTRACT_AND_RUN=1'
 	process.run()
 	process.wait()
 	// 删除编译目录

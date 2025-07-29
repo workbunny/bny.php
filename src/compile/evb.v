@@ -33,11 +33,10 @@ fn get_evbfile() !string {
  * @return !void
  */
 pub fn evb_compile() ! {
-	dl := Download{}
 	// evb编译文件路径
 	evb_file := get_evbfile()!
 	// evb执行文件路径
-	evb_exe := dl.evb.path
+	evb_exe := Download.evb.next().file
 	// 编译
 	mut process := os.new_process(evb_exe)
 	process.set_args([evb_file])
@@ -52,11 +51,10 @@ pub fn evb_compile() ! {
  * @return !string
  */
 fn get_mainfile() !string {
-	dl := Download{}
 	mainfile := if is_term() {
-		dl.cli.path
+		Download.cli.next().file
 	} else {
-		dl.win32.path
+		Download.win32.next().file
 	}
 	return mainfile
 }

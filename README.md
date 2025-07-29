@@ -32,9 +32,16 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 
 ## 支持
 
-- windows
+- windows x86_64
 
-- linux
+- linux x86_64
+
+### docker 和 Linux 要求
+
+```bash
+apt install -y file # linux 和 docker
+export APPIMAGE_EXTRACT_AND_RUN=1 # docker
+```
 
 ## 后续目标
 

@@ -35,6 +35,7 @@ pub fn run() ! {
 		}
 		println(term.dim('正在解压...'))
 		size := szip.extract_zip_to_dir(base.path_add(dir, name + '.zip'), dir)!
+		os.rm(base.path_add(dir, name + '.zip'))!
 		if !size {
 			println(term.red('解压失败!请重新下载!'))
 			exit(1)
@@ -45,7 +46,6 @@ pub fn run() ! {
 		}
 		info.php = info.php_list.len - 1
 		base.set_info(info)!
-		os.rm(base.path_add(dir, name + '.zip'))!
 		println(term.green('添加成功!'))
 	}
 }
