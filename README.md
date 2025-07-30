@@ -1,6 +1,6 @@
 # bny.php
 
-💕 Buy.php 一 个 简 易 的 PHP 管 理 工 具
+💕 Bny.php 一 个 简 易 的 PHP 管 理 工 具
 
 💕 集 成 各 种 便 捷 工 具 方 便 开 发
 
