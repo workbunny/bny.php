@@ -124,7 +124,7 @@ pub fn help() ! {
 	str << usage
 	// 指令
 	mut commands := term.yellow('指令: \n')
-	commands += term.green('  worker                ') + '运行服务器\n'
+	commands += term.green('  worker                ') + '运行FPM项目\n'
 	commands += term.green('  php                   ') + '运行PHP\n'
 	commands += term.green('  composer              ') + '运行Composer\n'
 	commands += term.green('  compile               ') + '编译项目\n'

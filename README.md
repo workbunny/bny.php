@@ -2,7 +2,13 @@
 
 💕 Buy.php 一 个 简 易 的 PHP 管 理 工 具
 
-集 成 各 种 便 捷 工 具 方 便 开 发
+💕 集 成 各 种 便 捷 工 具 方 便 开 发
+
+💕 大 部 分 编 程 功 能 都 是 PHP 本 身 不 用 担 心 要 逃 离 舒 适 圈
+
+- 编译cli项目 编译为单个可执行文件(方便分发)
+- 运行FPM项目 使用cli模式运行FPM项目
+- php版本管理 可以安装多个php版本,并在项目中切换使用
 
 ```sh
     __                        __
@@ -23,9 +29,11 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
   php                   运行PHP
   composer              运行Composer
   compile               编译项目
-  add                   添加php版本
+  add                   添加/选择php版本
   search                搜索php版本
+  delete                删除php版本
   lists                 查看已安装的php
+  clean                 清理缓存垃圾
 
 
 选项:
@@ -38,6 +46,8 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 - windows x86_64
 
 - linux x86_64
+
+- linux aarch64 (待支持...)
 
 ### docker 和 Linux 要求
 
