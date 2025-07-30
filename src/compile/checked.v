@@ -18,6 +18,7 @@ pub enum Download {
 	evb
 	cli
 	win32
+	rcedit
 	// linux 所需依赖
 	appimage
 	runtime
@@ -31,6 +32,13 @@ pub fn (dl Download) next() Url {
 				name: 'evb.zip'
 				path: '/executables'
 				file: base.path_add(base.Dirs{}.script, 'enigmavbconsole.exe')
+			}
+		}
+		.rcedit {
+			return Url{
+				name: 'rcedit-x64.zip'
+				path: '/executables'
+				file: base.path_add(base.Dirs{}.script, 'rcedit-x64.exe')
 			}
 		}
 		.cli {
@@ -98,6 +106,9 @@ fn windows() ! {
 	}
 	if !os.is_file(Download.win32.next().file) {
 		download(Download.win32.next())!
+	}
+	if !os.is_file(Download.rcedit.next().file) {
+		download(Download.rcedit.next())!
 	}
 }
 

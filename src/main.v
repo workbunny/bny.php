@@ -10,6 +10,7 @@ import compile
 import os
 import clean
 import worker
+import delete
 
 /**
  * 初始化
@@ -67,6 +68,9 @@ fn main() {
 			}
 			'search' {
 				search.run()!
+			}
+			'delete' {
+				delete.run()!
 			}
 			'clean' {
 				clean.run()!

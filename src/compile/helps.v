@@ -75,7 +75,8 @@ pub fn is_term() bool {
  *
  * @return void
  */
-pub fn help() {
+pub fn help() ! {
+	info := base.get_info()!
 	mut arr := []string{}
 	arr << term.yellow('用法:')
 	arr << ''
@@ -91,10 +92,11 @@ pub fn help() {
 	arr << ''
 	arr << term.blue('  -noterm                     ') + '不显示终端窗口'
 	arr << term.blue('  -o [name]                   ') + '编译为指定文件名'
+	arr << term.blue('  -icon [file]                ') + '编译为指定图标'
 	arr << ''
 	arr << term.yellow('示例:')
 	arr << ''
-	arr << term.green('  intg compile ') + term.blue('.')
-	arr << term.green('  intg compile ') + term.blue('index.php')
+	arr << term.green('  ${info.name} compile ') + term.blue('.')
+	arr << term.green('  ${info.name} compile ') + term.blue('index.php')
 	println(arr.join('\n'))
 }

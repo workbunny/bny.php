@@ -43,6 +43,8 @@ pub fn evb_compile() ! {
 	process.run()
 	// 等待编译完成
 	process.wait()
+	// 资源设置信息
+	rcedit()!
 }
 
 /**

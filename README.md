@@ -2,6 +2,8 @@
 
 💕 Buy.php 一 个 简 易 的 PHP 管 理 工 具
 
+集 成 各 种 便 捷 工 具 方 便 开 发
+
 ```sh
     __                        __
    / /_  ____  __  __  ____  / /_  ____
@@ -17,7 +19,7 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 
 
 指令:
-  worker                运行服务器
+  worker                运行FPM项目
   php                   运行PHP
   composer              运行Composer
   compile               编译项目
@@ -46,8 +48,8 @@ export APPIMAGE_EXTRACT_AND_RUN=1 # docker
 
 ## 后续目标
 
-- server 模式 （可以直接运行项目）
+- server 模式 
 
-- ffi助手
+- ffi助手 
 
 - 可以考虑加入sql一起管理

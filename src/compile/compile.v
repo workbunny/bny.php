@@ -14,7 +14,7 @@ pub fn run() ! {
 	mut args := base.get_args()
 	args.delete(0)
 	if args.len == 0 || args[0] == '-h' {
-		help()
+		help()!
 	} else {
 		build()!
 	}

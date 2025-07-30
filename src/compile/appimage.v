@@ -3,6 +3,7 @@ module compile
 import base
 import os
 import php
+import os.cmdline
 
 /**
  * 编译项目
@@ -59,11 +60,17 @@ fn create_project() ! {
 	os.write_file(base.path_add(dir, '.desktop'), apprun_desktop.join('\n'))!
 
 	// 图标文件
-	if os.is_file(base.path_add(get_impdir()!, 'icon.png')) {
-		os.cp(base.path_add(get_impdir()!, 'icon.png'), base.path_add(dir, 'icon.png'))!
+	mut icon := cmdline.option(base.get_args(), '-icon', '')
+	if icon != '' {
+		if os.is_file(icon) {
+			os.cp(icon, base.path_add(dir, 'icon.png'))!
+		} else {
+			panic('图标文件不存在:${icon}')
+		}
 	} else {
 		os.write_file(base.path_add(dir, 'icon.png'), '')!
 	}
+
 	// 复制项目
 	cp_project()!
 }
