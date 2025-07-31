@@ -92,7 +92,7 @@ fn appimage_compile() ! {
 	// 编译
 	mut process := os.new_process(appimage_tool)
 	process.set_args([apprun_dir, '--runtime-file', runtime, '-n', outfile ,'--appimage-extract-and-run'])
-	process.env << 'ARCH=x86_64'
+	process.env << 'ARCH=' + base.get_machine()
 	process.env << 'APPIMAGE_EXTRACT_AND_RUN=1'
 	process.run()
 	process.wait()

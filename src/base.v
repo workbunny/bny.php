@@ -87,6 +87,7 @@ pub fn get_info() !Info {
 		mut file := json.encode(info)
 		os.write_file(path, file)!
 	}
+	os.chmod(path, 0o777)!
 	return info
 }
 
@@ -99,6 +100,16 @@ pub fn get_info() !Info {
 pub fn set_info(info Info) ! {
 	mut file := json.encode(info)
 	os.write_file(path_add(app_path(), 'info.json'), file)!
+}
+
+/**
+ * 获取系统架构
+ *
+ * @return string
+ */
+pub fn get_machine() string{
+	uname := os.uname()
+	return uname.machine
 }
 
 /**

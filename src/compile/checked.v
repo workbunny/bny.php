@@ -58,16 +58,16 @@ pub fn (dl Download) next() Url {
 		// linux 所需依赖
 		.appimage {
 			return Url{
-				name: 'appimagetool-x86_64.zip'
+				name: 'appimagetool-${base.get_machine()}.zip'
 				path: '/executables'
-				file: base.path_add(base.Dirs{}.script, 'appimagetool-x86_64.AppImage')
+				file: base.path_add(base.Dirs{}.script, 'appimagetool-${base.get_machine()}.AppImage')
 			}
 		}
 		.runtime {
 			return Url{
-				name: 'runtime-x86_64.zip'
+				name: 'runtime-${base.get_machine()}.zip'
 				path: '/executables'
-				file: base.path_add(base.Dirs{}.script, 'runtime-x86_64')
+				file: base.path_add(base.Dirs{}.script, 'runtime-${base.get_machine()}')
 			}
 		}
 	}

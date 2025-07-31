@@ -42,8 +42,8 @@ pub fn path_php_cli() string {
 	mut path := '/php'
 	if os.user_os() == 'windows' {
 		path += '/windows/x86_64/cli'
-	} else {
-		path += '/linux/x86_64/cli'
+	} else if os.user_os() == 'linux' {
+		path += '/linux/${base.get_machine()}/cli'
 	}
 	return path
 }
@@ -58,7 +58,11 @@ pub fn path_php_cli() string {
  */
 pub fn download(path string, file string, dir string) ! http.Response{
 	url := Http{}.url + 'download?path=${path}&file=${file}'
-	params := http.DownloaderParams{}
+	params := http.DownloaderParams{
+		FetchConfig: http.FetchConfig{
+			method: .post
+		}
+	}
 	resp := http.download_file_with_progress(url, base.path_add(dir, file), params)!
 	return resp
 }
