@@ -56,13 +56,10 @@ pub fn path_php_cli() string {
  * @param string dir 目录
  * @return !http.Response
  */
-pub fn download(path string, file string, dir string) ! http.Response{
+pub fn download(path string, file string, dir string) !http.Response {
 	url := Http{}.url + 'download?path=${path}&file=${file}'
-	params := http.DownloaderParams{
-		FetchConfig: http.FetchConfig{
-			method: .post
-		}
-	}
+	params := http.DownloaderParams{}
+	// 下载文件
 	resp := http.download_file_with_progress(url, base.path_add(dir, file), params)!
 	return resp
 }
