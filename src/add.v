@@ -28,11 +28,11 @@ pub fn run() ! {
 		println(term.dim('正在下载...'))
 		dir := base.path_add(base.app_path(), 'php')
 		path := files.path_php_cli()
-		resp := files.download(path, name + '.zip', dir)!
-		if resp.status_code != 200 {
+		files.download(path, name + '.zip', dir)!
+		/* if resp.status_code != 200 {
 			println(term.red('下载失败!'))
 			exit(1)
-		}
+		} */
 		println(term.dim('正在解压...'))
 		size := szip.extract_zip_to_dir(base.path_add(dir, name + '.zip'), dir)!
 		os.rm(base.path_add(dir, name + '.zip'))!

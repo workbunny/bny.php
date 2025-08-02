@@ -137,11 +137,11 @@ fn download(url Url) ! {
 	dir := base.Dirs{}.script
 	file_name := base.path_add(dir, url.name)
 	// 下载地址
-	resp := files.download(url.path, url.name, dir)!
-	if resp.status_code != 200 {
+	files.download(url.path, url.name, dir)!
+	/* if resp.status_code != 200 {
 		println(term.red('下载失败!'))
 		exit(1)
-	}
+	} */
 	// 解压文件
 	zip := szip.extract_zip_to_dir(file_name, dir)!
 	// 删除压缩包文件

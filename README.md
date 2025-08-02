@@ -45,9 +45,7 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 
 - windows x86_64
 
-- linux x86_64
-
-- linux aarch64 (待支持...)
+- linux x86_64、arrch64(测试)
 
 ### docker 和 Linux 要求
 
@@ -62,4 +60,4 @@ export APPIMAGE_EXTRACT_AND_RUN=1 # docker
 
 - ffi助手 
 
-- 可以考虑加入sql一起管理
+- 再说...

@@ -2,7 +2,7 @@ module composer
 
 import base
 import term
-import net.http
+import files
 import os
 import php
 
@@ -22,11 +22,11 @@ pub fn run() ! {
  *
  * @return !string
  */
-pub fn get_composer_path() ! string {
+pub fn get_composer_path() !string {
 	str := base.Composer{}.path
 	if !os.is_file(base.Composer{}.path) {
 		println(term.dim('安装composer...'))
-		download()!
+		download_file()!
 	}
 	return str
 }
@@ -36,8 +36,8 @@ pub fn get_composer_path() ! string {
  *
  * @return !void
  */
-fn download() ! {
-	http.download_file(base.Composer{}.url, base.Composer{}.path)!
+fn download_file() ! {
+	files.download_file(base.Composer{}.url, base.Composer{}.path)!
 	// 设置文件权限
 	if os.is_file(base.Composer{}.path) {
 		os.chmod(base.Composer{}.path, 0o777)!

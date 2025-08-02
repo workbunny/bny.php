@@ -51,7 +51,7 @@ fn create_project() ! {
 	apprun_desktop << '[Desktop Entry]'
 	apprun_desktop << 'Name=${main_filename}'
 	apprun_desktop << 'Type=Application'
-	apprun_desktop << 'Exec=AppRun --no-sandbox'
+	apprun_desktop << 'Exec=AppRun'
 	apprun_desktop << 'Icon=icon'
 	if is_term() {
 		apprun_desktop << 'Terminal=true'
@@ -90,16 +90,17 @@ fn appimage_compile() ! {
 	// 运行时
 	runtime := Download.runtime.next().file
 	// 编译
-	mut process := os.new_process(appimage_tool)
-	process.set_args([apprun_dir, '--runtime-file', runtime, '-n', outfile ,'--appimage-extract-and-run'])
+	println('ARCH=${base.get_machine()} ${appimage_tool} --appimage-extract-and-run ${apprun_dir} --runtime-file ${runtime} -n ${outfile}')
+	/* mut process := os.new_process(appimage_tool)
+	process.set_args(['--appimage-extract-and-run', apprun_dir, '--runtime-file', runtime, '-n',
+		outfile])
 	process.env << 'ARCH=' + base.get_machine()
-	process.env << 'APPIMAGE_EXTRACT_AND_RUN=1'
 	process.run()
 	process.wait()
 	// 删除编译目录
 	base.rm_all(apprun_dir)!
 	// 设置权限
-	os.chmod(outfile, 0o755)!
+	os.chmod(outfile, 0o755)! */
 }
 
 /**
@@ -130,7 +131,7 @@ fn cp_project() ! {
 		println('[编译]: ' + base.path_add(impdir, i))
 		os.cp_all(base.path_add(impdir, i), base.path_add(apprun_dir, i), true)!
 	}
-
+	println(dir)
 	// 设置权限
 	base.chmod_all(dir, 0o777)!
 }

@@ -4,6 +4,7 @@ import net.http
 import json
 import os
 import base
+import kingbes.libgo
 
 struct Http {
 	url string = 'http://tool.kllxs.top/'
@@ -48,18 +49,32 @@ pub fn path_php_cli() string {
 	return path
 }
 
+pub fn download_file(url string, path string) ! {
+	res := libgo.download_file(url, path)
+	if res != '' {
+		panic(res)
+	}
+}
+
 /**
  * 下载文件
  *
  * @param string path 路径
  * @param string file 文件名
  * @param string dir 目录
- * @return !http.Response
+ * @return !void
  */
-pub fn download(path string, file string, dir string) !http.Response {
+pub fn download(path string, file string, dir string) ! {
 	url := Http{}.url + 'download?path=${path}&file=${file}'
-	params := http.DownloaderParams{}
+	
+	// vlang本身存在bug
+	/* params := http.DownloaderParams{}
 	// 下载文件
 	resp := http.download_file_with_progress(url, base.path_add(dir, file), params)!
-	return resp
+	return resp */
+
+	res := libgo.download_file(url, base.path_add(dir, file))
+	if res != '' {
+		panic(res)
+	}
 }
