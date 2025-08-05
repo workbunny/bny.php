@@ -47,11 +47,11 @@ Bny: v0.0.1 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 
 - linux x86_64、arrch64(测试)
 
-### docker 和 Linux 要求
+### Linux 要求
 
 ```bash
-apt install -y file # linux 和 docker
-export APPIMAGE_EXTRACT_AND_RUN=1 # docker
+apt install -y file 
+export APPIMAGE_EXTRACT_AND_RUN=1 
 ```
 
 ## 后续目标

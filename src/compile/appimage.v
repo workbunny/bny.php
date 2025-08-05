@@ -91,12 +91,7 @@ fn appimage_compile() ! {
 	runtime := Download.runtime.next().file
 	// 编译
 	mut process := os.new_process(appimage_tool)
-	mut p_args := []string{}
-	if is_docker() {
-		p_args << '--appimage-extract-and-run'
-	}
-	p_args << [apprun_dir, '--runtime-file', runtime, '-n', outfile]
-	process.set_args(p_args)
+	process.set_args(['--appimage-extract-and-run',apprun_dir, '--runtime-file', runtime, '-n', outfile])
 	process.env << 'ARCH=' + base.get_machine()
 	process.run()
 	process.wait()
