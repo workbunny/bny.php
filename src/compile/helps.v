@@ -71,6 +71,21 @@ pub fn is_term() bool {
 }
 
 /**
+ * 是否使用docker
+ *
+ * @return bool
+ */
+pub fn is_docker() bool {
+	args := base.get_args()
+	for item in args {
+		if item == '-docker' {
+			return true
+		}
+	}
+	return false
+}
+
+/**
  * 帮助信息
  *
  * @return void
@@ -91,6 +106,7 @@ pub fn help() ! {
 	arr << term.yellow('指令:')
 	arr << ''
 	arr << term.blue('  -noterm                     ') + '不显示终端窗口'
+	arr << term.blue('  -docker                     ') + 'docker容器中使用'
 	arr << term.blue('  -o [name]                   ') + '编译为指定文件名'
 	arr << term.blue('  -icon [file]                ') + '编译为指定图标'
 	arr << ''

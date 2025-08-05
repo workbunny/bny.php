@@ -20,7 +20,7 @@ pub fn run() ! {
 	} else {
 		php_path := php.get_php_path()!
 		mut process := os.new_process(php_path)
-		mut new_args := [base.path_add(Worker{}.dir, 'main.php')]
+		mut new_args := [base.path_add(Worker{}.dir, 'index.php')]
 		new_args << args
 		process.set_args(new_args)
 		process.run()

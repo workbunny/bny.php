@@ -11,12 +11,10 @@ class Main
 {
     private string $host = '0.0.0.0';
     private int $port = 8787;
-    private string $webRoot = './';
     private Worker $worker;
 
-    public function __construct(string $webRoot)
+    public function __construct()
     {
-        $this->webRoot = $webRoot;
         $worker = new Worker("http://{$this->host}:{$this->port}");
         $worker->name = 'Bny-Worker';
         $worker->count = 4;
@@ -40,7 +38,7 @@ class Main
             'CONTENT_TYPE'     => $request->header('content-type'),
             'CONTENT_LENGTH'    => $request->header('content-length'),
             'SCRIPT_NAME'      => '/index.php', // 统一入口
-            'SCRIPT_FILENAME'  => $this->webRoot . '/index.php',
+            'SCRIPT_FILENAME'  => WEB_ROOT . '/index.php',
             'PHP_SELF'          => '/index.php',
         ];
         // 2. 填充请求数据
@@ -63,7 +61,7 @@ class Main
 
         try {
             // 执行入口文件（模拟FPM环境）
-            include $this->webRoot . '/index.php';
+            include WEB_ROOT . '/index.php';
         } catch (\Throwable $e) {
             // 异常处理
             ob_end_clean();

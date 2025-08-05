@@ -90,17 +90,18 @@ fn appimage_compile() ! {
 	// 运行时
 	runtime := Download.runtime.next().file
 	// 编译
-	println('ARCH=${base.get_machine()} ${appimage_tool} --appimage-extract-and-run ${apprun_dir} --runtime-file ${runtime} -n ${outfile}')
-	/* mut process := os.new_process(appimage_tool)
-	process.set_args(['--appimage-extract-and-run', apprun_dir, '--runtime-file', runtime, '-n',
-		outfile])
+	mut process := os.new_process(appimage_tool)
+	mut p_args := []string{}
+	if is_docker() {
+		p_args << '--appimage-extract-and-run'
+	}
+	p_args << [apprun_dir, '--runtime-file', runtime, '-n', outfile]
+	process.set_args(p_args)
 	process.env << 'ARCH=' + base.get_machine()
 	process.run()
 	process.wait()
-	// 删除编译目录
-	base.rm_all(apprun_dir)!
 	// 设置权限
-	os.chmod(outfile, 0o755)! */
+	os.chmod(outfile, 0o755)!
 }
 
 /**
