@@ -3,7 +3,6 @@ module base
 import os
 import term
 import json
-import time
 import regex
 
 pub struct Phplist {
@@ -118,6 +117,9 @@ pub fn get_machine() string{
  * @return !void
  */
 pub fn help() ! {
+	
+	clean_size := size_format(path_size(path_add(app_path(), 'log'))!)
+
 	info := get_info()!
 	mut str := get_logo()
 	// 版本
@@ -127,7 +129,7 @@ pub fn help() ! {
 	version += if info.php > -1 { '已安装 ' } else { term.red('未安装 ') }
 	version += term.green('Composer: ')
 	version += if os.is_file(Composer{}.path) { '已安装 ' } else { term.red('未安装 ') }
-	version += term.blue(time.unix(os.file_last_mod_unix(os.args[0])).str()) + '\n'
+	version += term.green('缓存: ') + term.red(clean_size) + '\n'
 	str << version
 	// 用法
 	mut usage := term.yellow('用法: \n')
@@ -271,6 +273,26 @@ pub fn file_name(path string) string {
 }
 
 /**
+ * 格式化大小
+ *
+ * @param u64 size 大小
+ * @return string
+ */
+pub fn size_format(size u64) string {
+	mut str := ''
+	if size > 1024 * 1024 * 1024 {
+		str = '${(size / 1024 / 1024 / 1024).str()}GB'
+	} else if size > 1024 * 1024 {
+		str = '${(size / 1024 / 1024).str()}MB'
+	} else if size > 1024 {
+		str = '${(size / 1024).str()}KB'
+	} else {
+		str = '${size.str()}B'
+	}
+	return str
+}
+
+/**
  * 路径添加
  *
  * @param string ...path 路径
@@ -286,6 +308,29 @@ pub fn path_add(path ...string) string {
 		}
 	}
 	return str
+}
+
+/**
+ * 获取路径大小
+ *
+ * @param string path 路径
+ * @return !u64
+ */
+pub fn path_size(path string) !u64 {
+	mut size := u64(0)
+	// 判断是否文件
+	if os.is_file(path) {
+		size += os.file_size(path)
+	}
+	// 判断是否目录
+	if os.is_dir(path) {
+		mut arr := []string{}
+		arr << os.ls(path)!
+		for i in arr {
+			size += path_size(path_add(path, i))!
+		}
+	}
+	return size
 }
 
 /**

@@ -43,8 +43,6 @@ pub fn evb_compile() ! {
 	process.run()
 	// 等待编译完成
 	process.wait()
-	// 资源设置信息
-	rcedit()!
 }
 
 /**
@@ -53,11 +51,16 @@ pub fn evb_compile() ! {
  * @return !string
  */
 fn get_mainfile() !string {
-	mainfile := if is_term() {
+	name := time.now().custom_format('YYMDHms') + '.exe'
+	execfile := if is_term() {
 		Download.cli.next().file
 	} else {
 		Download.win32.next().file
 	}
+	mainfile := base.path_add(base.app_path(), 'log', name)
+	os.cp(execfile, mainfile)!
+	// 资源设置信息
+	rcedit(mainfile)!
 	return mainfile
 }
 
