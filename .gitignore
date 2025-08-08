@@ -11,8 +11,8 @@ php
 info.json
 composer.phar
 log/
-server/vendor
-server/composer.lock
+worker/vendor
+worker/composer.lock
 
 # Ignore binary output folders
 bin/

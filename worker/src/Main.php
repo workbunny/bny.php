@@ -13,6 +13,9 @@ class Main
     private int $port = 8787;
     private Worker $worker;
 
+    /**
+     * 构造函数
+     */
     public function __construct()
     {
         $worker = new Worker("http://{$this->host}:{$this->port}");
@@ -24,6 +27,13 @@ class Main
         $this->worker = $worker;
     }
 
+    /**
+     * 处理请求
+     *
+     * @param TcpConnection $connection 连接对象
+     * @param Request $request 请求对象
+     * @return void
+     */
     public function onMessage(TcpConnection $connection, Request $request)
     {
         // 1. 初始化超全局变量
@@ -81,6 +91,11 @@ class Main
         $connection->send($response);
     }
 
+    /**
+     * 运行服务
+     *
+     * @return void
+     */
     public function run()
     {
         $this->worker::runAll();

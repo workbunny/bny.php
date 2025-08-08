@@ -9,7 +9,7 @@ import php
 import compile
 import os
 import clean
-import worker
+import run
 import delete
 
 /**
@@ -48,8 +48,8 @@ fn main() {
 		base.help()!
 	} else {
 		match args_main[0] {
-			'worker' {
-				worker.run()!
+			'run' {
+				run.run()!
 			}
 			'php' {
 				php.run()!

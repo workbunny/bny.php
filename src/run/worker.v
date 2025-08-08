@@ -1,13 +1,14 @@
-module worker
+module run
 
 import php
 import composer
 import os
 import base
 import term
+import os.cmdline
 
 struct Worker {
-	dir string = base.path_add(base.app_path(), 'server')
+	dir string = base.path_add(base.app_path(), 'worker')
 }
 
 pub fn run() ! {
@@ -20,12 +21,36 @@ pub fn run() ! {
 	} else {
 		php_path := php.get_php_path()!
 		mut process := os.new_process(php_path)
-		mut new_args := [base.path_add(Worker{}.dir, 'index.php')]
-		new_args << args
-		process.set_args(new_args)
+		mut new_arg := new_args()!
+		if os.is_file(base.path_add(os.getwd(), 'bny.config.json')) {
+			new_arg.insert(0,base.path_add(Worker{}.dir, 'run.php'))
+		}
+		process.set_args(new_arg)
 		process.run()
 		process.wait()
 	}
+}
+
+/**
+ * 新的参数
+ *
+ * @return ![]string
+ */
+fn new_args() ![]string {
+	mut args := base.get_args()
+	mut arg := cmdline.option(args, 'run', '.')
+	if arg == '.' {
+		arg = 'index.php'
+	}
+	if base.file_name_ext(arg) != 'index.php' {
+		panic('入口文件必须是 index.php')
+	}
+	if !os.is_file(arg) {
+		panic('入口文件不存在')
+	}
+	args.delete(0)
+	args[0] = arg
+	return args
 }
 
 /**
@@ -58,12 +83,12 @@ fn help() ! {
 	mut arr := []string{}
 	arr << term.yellow('用法:')
 	arr << ''
-	arr << term.green('${info.name} worker ') + term.blue('[目标] <指令>')
+	arr << term.green('${info.name} run ') + term.blue('[目标] <指令>')
 	arr << ''
 	arr << term.yellow('目标:')
 	arr << ''
-	arr << term.blue('  [dir]                      ') + '入口目录'
-	arr << term.blue('  -h                         ') + '帮助查看'
+	arr << term.blue('  [file]                    ') + 'index.php 入口文件'
+	arr << term.blue('  -h                        ') + '帮助查看'
 	arr << ''
 	arr << term.yellow('指令:') + term.dim('Linux 指令')
 	arr << ''
