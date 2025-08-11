@@ -9,8 +9,6 @@ use Workerman\Connection\TcpConnection;
 
 class Main
 {
-    private string $host = '0.0.0.0';
-    private int $port = 8787;
     private Worker $worker;
 
     /**
@@ -18,13 +16,15 @@ class Main
      */
     public function __construct()
     {
-        $worker = new Worker("http://{$this->host}:{$this->port}");
-        $worker->name = 'Bny-Worker';
-        $worker->count = 4;
-        $worker->onMessage = function (TcpConnection $connection, Request $request) {
-            $this->onMessage($connection, $request);
-        };
-        $this->worker = $worker;
+        if (isset(BNY_CONFIG['process']['http'])) {
+            $worker = new Worker(BNY_CONFIG['process']['http']['listen']);
+            $worker->name = BNY_CONFIG['process']['http']['name'];
+            $worker->count = 4;
+            $worker->onMessage = function (TcpConnection $connection, Request $request) {
+                $this->onMessage($connection, $request);
+            };
+            $this->worker = $worker;
+        }
     }
 
     /**
