@@ -48,7 +48,7 @@ class Main
             'CONTENT_TYPE'     => $request->header('content-type'),
             'CONTENT_LENGTH'    => $request->header('content-length'),
             'SCRIPT_NAME'      => '/index.php', // 统一入口
-            'SCRIPT_FILENAME'  => WEB_ROOT . '/index.php',
+            'SCRIPT_FILENAME'  => BNY_CONFIG["main"],
             'PHP_SELF'          => '/index.php',
         ];
         // 2. 填充请求数据
@@ -71,7 +71,7 @@ class Main
 
         try {
             // 执行入口文件（模拟FPM环境）
-            include WEB_ROOT . '/index.php';
+            include BNY_CONFIG["main"];
         } catch (\Throwable $e) {
             // 异常处理
             ob_end_clean();

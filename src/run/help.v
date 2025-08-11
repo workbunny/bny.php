@@ -1,5 +1,32 @@
 module run
 
+import base
+import term
+import os.cmdline
+import os
+
+/**
+ * 新的参数
+ *
+ * @return ![]string
+ */
+pub fn new_args() ![]string {
+	mut args := base.get_args()
+	arg := cmdline.option(args, 'run', '')
+	args.delete(0)
+	if arg == '' {
+		panic('请指定目标')
+	}
+	if arg == '.' {
+		if os.is_file(base.path_add(os.getwd(), 'bny.config.json')) {
+			args[0] = base.path_add(Worker{}.dir, 'run.php')
+			args.insert(1, base.path_add(os.getwd(), 'bny.config.json'))
+		} else {
+			args[0] = 'index.php'
+		}
+	}
+	return args
+}
 
 pub fn help() ! {
 	info := base.get_info()!
