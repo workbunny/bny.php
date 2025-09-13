@@ -18,16 +18,45 @@ pub fn new_args() ![]string {
 		panic('请指定目标')
 	}
 	if arg == '.' {
-		if os.is_file(base.path_add(os.getwd(), 'bny.config.json')) {
-			args[0] = base.path_add(Worker{}.dir, 'run.php')
-			args.insert(1, base.path_add(os.getwd(), 'bny.config.json'))
-		} else {
-			args[0] = 'index.php'
+		args[0] = 'index.php'
+	}
+	for i, v in args {
+		if v == '-v' {
+			if args[i+1] != '' {
+				args.delete(i+1)
+			}
+			args.delete(i)
+			break
 		}
 	}
 	return args
 }
 
+/**
+ * 获取php解析器文件路径
+ *
+ * @return ! string
+ */
+pub fn get_php_path() !string {
+	info := base.get_info()!
+	args := base.get_args()
+	ver := cmdline.option(args, '-v', info.php_list[info.php].name)
+	mut index := -1
+	for k, v in info.php_list {
+		if v.name == ver {
+			index = k
+			break
+		}
+	}
+	ext := if os.user_os() == 'windows' { '.exe' } else { '' }
+	return base.path_add(info.php_list[index].path, 'php' + ext)
+}
+
+/**
+ * 帮助查看
+ *
+ * @return !
+ */
 pub fn help() ! {
 	info := base.get_info()!
 	mut arr := []string{}
@@ -37,17 +66,9 @@ pub fn help() ! {
 	arr << ''
 	arr << term.yellow('目标:')
 	arr << ''
-	arr << term.blue('  [file]                    ') + 'index.php 入口文件'
+	arr << term.blue('  [file]                    ') + '入口文件'
+	arr << term.blue('  -v [number]               ') + '指定PHP版本号'
 	arr << term.blue('  -h                        ') + '帮助查看'
-	arr << ''
-	arr << term.yellow('指令:') + term.dim('Linux 指令')
-	arr << ''
-	arr << term.blue('  start                     ') + '启动服务'
-	arr << term.blue('  stop                      ') + '停止服务'
-	arr << term.blue('  restart                   ') + '重启服务'
-	arr << term.blue('  status                    ') + '查看服务状态'
-	arr << term.blue('  reload                    ') + '重新加载服务'
-	arr << term.blue('  connections               ') + '查看连接数'
 	arr << ''
 	println(arr.join('\n'))
 }

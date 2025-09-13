@@ -43,7 +43,12 @@ fn create_project() ! {
 	mut apprun_file := []string{}
 	apprun_file << '#! /usr/bin/env bash'
 	apprun_file << 'dir=$(dirname $(realpath $0))'
-	apprun_file << 'exec \$dir"/usr/bin/php" \$dir"/usr/bin/${main_filename_ext}" $@'
+	apprun_file << 'ini_file=\$dir"/usr/bin/php.ini"'
+	apprun_file << 'if [[ -f "\$ini_file" ]]; then'
+	apprun_file << '	exec \$dir"/usr/bin/php" -c \$ini_file \$dir"/usr/bin/${main_filename_ext}" $@'
+	apprun_file << 'else'
+	apprun_file << '	exec \$dir"/usr/bin/php" \$dir"/usr/bin/${main_filename_ext}" $@'
+	apprun_file << 'fi'
 	os.write_file(base.path_add(dir, 'AppRun'), apprun_file.join('\n'))!
 
 	// 配置文件

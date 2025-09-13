@@ -12,6 +12,9 @@ fn main() {
 	}
 	mut args := os.args.clone()
 	args[0] = 'index.php'
+	if os.is_file("./php.ini"){
+		args << ["-c","./php.ini"]
+	}
 	mut process := os.new_process(file)
 	process.set_args(args)
 	process.create_no_window = true // 不显示窗口

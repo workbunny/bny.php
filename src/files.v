@@ -45,6 +45,8 @@ pub fn path_php_cli() string {
 		path += '/windows/x86_64/cli'
 	} else if os.user_os() == 'linux' {
 		path += '/linux/${base.get_machine()}/cli'
+	}else {
+		path += '/macos/${base.get_machine()}/cli'
 	}
 	return path
 }

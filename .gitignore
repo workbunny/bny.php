@@ -13,6 +13,7 @@ composer.phar
 log/
 worker/vendor
 worker/composer.lock
+.codebuddy
 
 # Ignore binary output folders
 bin/
