@@ -1,0 +1,59 @@
+name: MACOS
+
+on: 
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  bny-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Go
+      run: |
+        curl -OL https://golang.google.cn/dl/go1.25.1.darwin-amd64.pkg
+        sudo installer -pkg go1.25.1.darwin-amd64.pkg -target /
+        echo "GOROOT=$(go env GOROOT)" >> $GITHUB_ENV
+        echo "$(go env GOROOT)/bin" >> $GITHUB_PATH
+        
+    - name: Install V
+      run: |
+        curl -LO https://github.com/vlang/v/releases/latest/download/v_macos_x86_64.zip
+        unzip v_macos_x86_64.zip
+        sudo mv v /usr/local/bin/
+        sudo chmod +x /usr/local/bin/v
+        rm v_macos_x86_64.zip
+
+    - name: Install build dependencies
+      run: |
+        brew update
+        brew install gcc@13
+        sudo ln -sf /usr/local/bin/gcc-13 /usr/local/bin/gcc
+    - name: Setup environment
+      run: |
+        echo "CC=gcc" >> $GITHUB_ENV
+        echo "VFLAGS=-cc gcc -os macos" >> $GITHUB_ENV
+
+    # 添加libgo模块
+    - name: Add libgo module
+      run: v add libgo
+
+    # 构建libgo
+    - name: Build libgo
+      run: |
+        chmod +x $HOME/.vmodules/kingbes/libgo/go/build.sh
+        $HOME/.vmodules/kingbes/libgo/go/build.sh
+
+    # 编译主项目
+    - name: Compile project
+      run: v $VFLAGS -o bny .
+
+    # 上传制品
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: bny-binary
+        path: bny
