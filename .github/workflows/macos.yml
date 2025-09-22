@@ -34,9 +34,9 @@ jobs:
         script_path="$HOME/.vmodules/kingbes/libgo/go/build.sh"
         chmod +x "$script_path"
         "$script_path"
-
+    
     - name: Build project
-      run: v -native -cc gcc -os macos -o bny .
+      run: export ARCHFLAGS="-arch arm64" && v -cc gcc -os macos -o bny .
 
     - name: Verify binary
       run: |
