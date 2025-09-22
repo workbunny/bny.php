@@ -8,8 +8,6 @@ on:
 jobs:
   build-macos:
     runs-on: macos-latest
-    # 架构为 arm64
-    arch: arm64
 
     steps:
     - name: Checkout code
