@@ -35,8 +35,11 @@ jobs:
         chmod +x "$script_path"
         "$script_path"
     
+    - name: Set arch arm64
+      run: export ARCHFLAGS="-arch arm64"
+
     - name: Build project
-      run: export ARCHFLAGS="-arch arm64" && v -cc gcc -os macos -o bny .
+      run: v -cc gcc -os macos -o bny .
 
     - name: Verify binary
       run: |
