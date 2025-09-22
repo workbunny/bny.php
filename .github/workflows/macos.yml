@@ -33,10 +33,10 @@ jobs:
       run: |
         script_path="$HOME/.vmodules/kingbes/libgo/go/build.sh"
         chmod +x "$script_path"
-        ARCH="$arch" "$script_path"
+        ARCH=arm64 "$script_path"
 
     - name: Build project
-      run: ARCH="$arch" v -cc gcc -os macos -o bny .
+      run: ARCH=arm64 v -cc gcc -os macos -o bny .
 
     - name: Verify binary
       run: |
