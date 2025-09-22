@@ -36,7 +36,7 @@ jobs:
         "$script_path"
 
     - name: Build project
-      run: v -cc gcc -os macos -o bny .
+      run: v -native -cc gcc -os macos -o bny .
 
     - name: Verify binary
       run: |
