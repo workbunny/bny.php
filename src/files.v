@@ -4,7 +4,10 @@ import net.http
 import json
 import os
 import base
+
+$if !macos {
 import kingbes.libgo
+}
 
 struct Http {
 	url string = 'http://tool.kllxs.top/'
@@ -53,12 +56,12 @@ pub fn path_php_cli() string {
 
 pub fn download_file(url string, path string) ! {
 	// 判断系统是否为macos
-	if os.user_os() == 'macos' {
+	$if macos {
 		res := os.execute('curl -fLsS -o "${path}" "${url}" &>/dev/null && echo 1 || echo 0')
 		if res.output.trim_space() == '0' {
 			panic('下载文件失败')
 		}
-	}else{
+	}$else{
 		res := libgo.download_file(url, path)
 		if res != '' {
 			panic(res)
@@ -84,12 +87,12 @@ pub fn download(path string, file string, dir string) ! {
 	return resp */
 	
 	// 判断系统是否为macos
-	if os.user_os() == 'macos' {
+	$if macos {
 		res := os.execute('curl -fLsS -o "${base.path_add(dir, file)}" "${url}" &>/dev/null && echo 1 || echo 0')
 		if res.output.trim_space() == '0' {
 			panic('下载文件失败')
 		}
-	}else{
+	}$else{
 		res := libgo.download_file(url, base.path_add(dir, file))
 		if res != '' {
 			panic(res)
