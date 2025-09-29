@@ -52,9 +52,17 @@ pub fn path_php_cli() string {
 }
 
 pub fn download_file(url string, path string) ! {
-	res := libgo.download_file(url, path)
-	if res != '' {
-		panic(res)
+	// 判断系统是否为macos
+	if os.user_os() == 'macos' {
+		res := os.execute('curl -fLsS -o "${path}" "${url}" &>/dev/null && echo 1 || echo 0')
+		if res.output.trim_space() == '0' {
+			panic('下载文件失败')
+		}
+	}else{
+		res := libgo.download_file(url, path)
+		if res != '' {
+			panic(res)
+		}
 	}
 }
 
@@ -74,9 +82,18 @@ pub fn download(path string, file string, dir string) ! {
 	// 下载文件
 	resp := http.download_file_with_progress(url, base.path_add(dir, file), params)!
 	return resp */
-
-	res := libgo.download_file(url, base.path_add(dir, file))
-	if res != '' {
-		panic(res)
+	
+	// 判断系统是否为macos
+	if os.user_os() == 'macos' {
+		res := os.execute('curl -fLsS -o "${base.path_add(dir, file)}" "${url}" &>/dev/null && echo 1 || echo 0')
+		if res.output.trim_space() == '0' {
+			panic('下载文件失败')
+		}
+	}else{
+		res := libgo.download_file(url, base.path_add(dir, file))
+		if res != '' {
+			panic(res)
+		}
 	}
+
 }
