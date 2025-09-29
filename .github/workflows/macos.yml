@@ -2,21 +2,17 @@ name: macOS Build and Release
 
 on:
   push:
-    tags: ['v*']  # 仅在标签推送时触发
+    branches: [ master ]
   workflow_dispatch:  # 允许手动触发
 
 jobs:
-  build-macos:
+  build-macos-x86_64:
     runs-on: macos-latest
+    name: Build for macOS x86_64
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.25'
 
     - name: Install V
       run: |
@@ -26,27 +22,49 @@ jobs:
         sudo ./v symlink
         v version
 
-    - name: Install libgo dependency
-      run: v install KingBes.libgo
+    - name: Build project for x86_64
+      run: v -cg -cc gcc -os macos -o bny .
 
-    - name: Prebuild Go components
-      run: |
-        script_path="$HOME/.vmodules/kingbes/libgo/go/build.sh"
-        chmod +x "$script_path"
-        ARCH=arm64 "$script_path"
-
-    - name: Build project
-      run: ARCH=arm64 v -cc gcc -os macos -o bny .
-
-    - name: Verify binary
+    - name: Verify binary for x86_64
       run: |
         file bny
         ./bny -v || true  # 即使版本检查失败也继续
 
-    - name: Upload artifact
+    - name: Upload artifact for x86_64
       uses: actions/upload-artifact@v4
       with:
-        name: bny-macos
+        name: bny-macos-x86_64
+        path: bny
+        if-no-files-found: error
+
+  build-macos-arm64:
+    runs-on: macos-latest
+    name: Build for macOS arm64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install V
+      run: |
+        git clone --depth=1 https://github.com/vlang/v
+        cd v
+        make
+        sudo ./v symlink
+        v version
+
+    - name: Build project for arm64
+      run: v -cg -cc gcc -os macos -o bny .
+
+    - name: Verify binary for arm64
+      run: |
+        file bny
+        ./bny -v || true  # 即使版本检查失败也继续
+
+    - name: Upload artifact for arm64
+      uses: actions/upload-artifact@v4
+      with:
+        name: bny-macos-arm64
         path: bny
         if-no-files-found: error
 

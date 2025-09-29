@@ -25,7 +25,7 @@ pub fn run() ! {
 			}
 		}
 
-		println(term.dim('正在下载...'))
+		println(term.dim('正在下载,请耐心等待...'))
 		dir := base.path_add(base.app_path(), 'php')
 		path := files.path_php_cli()
 		files.download(path, name + '.zip', dir)!
