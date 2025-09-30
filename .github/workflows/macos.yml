@@ -6,36 +6,6 @@ on:
   workflow_dispatch:  # 允许手动触发
 
 jobs:
-  build-macos-x86_64:
-    runs-on: macos-latest
-    name: Build for macOS x86_64
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install V
-      run: |
-        git clone --depth=1 https://github.com/vlang/v
-        cd v
-        make
-        sudo ./v symlink
-        v version
-
-    - name: Build project for x86_64
-      run: v -cg -cc gcc -os macos -o bny .
-
-    - name: Verify binary for x86_64
-      run: |
-        file bny
-        ./bny -v || true  # 即使版本检查失败也继续
-
-    - name: Upload artifact for x86_64
-      uses: actions/upload-artifact@v4
-      with:
-        name: bny-macos-x86_64
-        path: bny
-        if-no-files-found: error
 
   build-macos-arm64:
     runs-on: macos-latest
