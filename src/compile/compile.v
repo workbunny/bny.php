@@ -29,8 +29,10 @@ fn build() ! {
 	println(term.yellow('开始编译项目...'))
 	if os.user_os() == 'windows' {
 		evb_compile()!
-	} else {
+	} else if os.user_os() == 'linux' {
 		appimage_build()!
+	}else{
+		println(term.red('不支持的操作系统'))
 	}
 	println(term.blue('编译项目完成'))
 	outfile := get_outfile()!
