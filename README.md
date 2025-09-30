@@ -46,6 +46,8 @@ Bny: v0.0.3 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 
 - linux x86_64、arrch64
 
+- macos x86_64、arm64
+
 ### Linux 要求
 
 ```bash
