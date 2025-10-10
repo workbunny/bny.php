@@ -90,7 +90,7 @@ pub fn help() ! {
 	mut arr := []string{}
 	arr << term.yellow('用法:')
 	arr << ''
-	arr << term.green('intg compile ') + term.blue('[目标] <指令>')
+	arr << term.green('${info.name} compile ') + term.blue('[目标] <指令>')
 	arr << ''
 	arr << term.yellow('目标:')
 	arr << ''
