@@ -5,9 +5,9 @@ import json
 import os
 import base
 
-$if !macos {
+// $if !macos {
 import kingbes.libgo
-}
+// }
 
 struct Http {
 	url string = 'http://tool.kllxs.top/'

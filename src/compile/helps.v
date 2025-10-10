@@ -4,6 +4,7 @@ import term
 import os.cmdline
 import os
 import base
+import json
 
 /**
  * 获取入口文件路径
@@ -14,14 +15,17 @@ pub fn get_impfile() ! string {
 	args := base.get_args()
 	mut arg := cmdline.option(args, 'compile', '')
 	if arg == '.' {
-		arg = './index.php'
+		if os.exists('bny.json') {
+			// 读取 bny.json
+			bny := json.decode(base.BnyConfig, os.read_file('bny.json')!)!
+			arg = bny.main
+		}else{
+			arg = './index.php'
+		}
 	}
 	impfile := os.abs_path(arg)
 	if !os.is_file(impfile) {
 		panic('没有目标文件:${impfile}')
-	}
-	if base.file_name_ext(impfile) != 'index.php' {
-		panic('入口文件必须是 index.php')
 	}
 	return impfile
 }
@@ -32,7 +36,11 @@ pub fn get_impfile() ! string {
  * @return !string
  */
 pub fn get_impdir() ! string {
-	return os.dir(get_impfile()!)
+	mut file := os.dir(get_impfile()!)
+	if os.exists('bny.json') {
+		file = os.abs_path(os.dir('bny.json'))
+	}
+	return file
 }
 
 /**
@@ -41,14 +49,16 @@ pub fn get_impdir() ! string {
  * @return !string
  */
 pub fn get_outfile() ! string {
-	ext := if os.user_os() == 'windows' { '.exe' } else { '.bin' }
+	ext := if os.user_os() == 'windows' { '.exe' } 
+		else if os.user_os() == 'macos' { '.app' } 
+		else { '.bin' }
 	impfile := get_impfile()!
 	args := base.get_args()
 	mut str := cmdline.option(args, '-o', '')
 	if str == '' {
 		str = base.file_name(impfile)
 	}
-	outfile := base.path_add(os.dir(impfile), str + ext)
+	outfile := base.path_add(os.getwd(), str + ext)
 	return outfile
 }
 

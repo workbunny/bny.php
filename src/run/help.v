@@ -4,6 +4,7 @@ import base
 import term
 import os.cmdline
 import os
+import json
 
 /**
  * 新的参数
@@ -18,7 +19,21 @@ pub fn new_args() ![]string {
 		panic('请指定目标')
 	}
 	if arg == '.' {
-		args[0] = 'index.php'
+		//判断 bny.json 是否存在
+		if os.exists('bny.json') {
+			// 读取 bny.json
+			bny := json.decode(base.BnyConfig, os.read_file('bny.json')!)!
+			args[0] = bny.main
+			if bny.ini_path != '' {
+				args << '-c'
+				args << bny.ini_path
+			}
+			if bny.php_ins.len > 0 {
+				args << bny.php_ins
+			}
+		}else{
+			args[0] = 'index.php'
+		}
 	}
 	for i, v in args {
 		if v == '-v' {

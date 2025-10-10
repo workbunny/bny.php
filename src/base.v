@@ -14,7 +14,7 @@ pub mut:
 pub struct Info {
 pub mut:
 	name     string = 'bny'
-	version  string = 'v0.0.4'
+	version  string = 'v0.0.5'
 	php      int    = -1
 	php_list []Phplist
 }
@@ -29,6 +29,14 @@ pub struct Dirs {
 pub:
 	script string = path_add(app_path(), 'script')
 	log    string = path_add(app_path(), 'log')
+}
+
+// bny.json 配置文件
+pub struct BnyConfig {
+pub:
+	main string = "index.php" // 入口文件
+	ini_path string // ini文件路径
+	php_ins []string = []string{} // php 指令
 }
 
 /**

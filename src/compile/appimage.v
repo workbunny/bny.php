@@ -35,20 +35,13 @@ fn get_dir() !string {
  */
 fn create_project() ! {
 	dir := get_dir()!
-
-	main_filename_ext := base.file_name_ext(get_impfile()!)
 	main_filename := base.file_name(get_impfile()!)
 
 	// 执行文件
 	mut apprun_file := []string{}
 	apprun_file << '#! /usr/bin/env bash'
 	apprun_file << 'dir=$(dirname $(realpath $0))'
-	apprun_file << 'ini_file=\$dir"/usr/bin/php.ini"'
-	apprun_file << 'if [[ -f "\$ini_file" ]]; then'
-	apprun_file << '	exec \$dir"/usr/bin/php" -c \$ini_file \$dir"/usr/bin/${main_filename_ext}" $@'
-	apprun_file << 'else'
-	apprun_file << '	exec \$dir"/usr/bin/php" \$dir"/usr/bin/${main_filename_ext}" $@'
-	apprun_file << 'fi'
+	apprun_file << 'exec \$dir"/usr/bin/linux" $@'
 	os.write_file(base.path_add(dir, 'AppRun'), apprun_file.join('\n'))!
 
 	// 配置文件
@@ -122,6 +115,10 @@ fn cp_project() ! {
 	new_php_path := base.path_add(apprun_dir, php_name)
 	// 复制文件
 	os.cp(php_path, new_php_path)!
+	// 新的linux文件路径
+	new_linux_path := base.path_add(apprun_dir, 'linux')
+	// 复制文件
+	os.cp(Download.linux.next().file, new_linux_path)!
 
 	arr := os.ls(impdir)!
 	for i in arr {

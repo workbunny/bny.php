@@ -22,6 +22,7 @@ pub enum Download {
 	// linux 所需依赖
 	appimage
 	runtime
+	linux
 }
 
 pub fn (dl Download) next() Url {
@@ -68,6 +69,13 @@ pub fn (dl Download) next() Url {
 				name: 'runtime-${base.get_machine()}.zip'
 				path: '/executables'
 				file: base.path_add(base.Dirs{}.script, 'runtime-${base.get_machine()}')
+			}
+		}
+		.linux {
+			return Url{
+				name: 'linux.zip'
+				path: '/script'
+				file: base.path_add(base.Dirs{}.script, 'linux')
 			}
 		}
 	}
@@ -124,6 +132,9 @@ fn linux() ! {
 	if !os.is_file(Download.runtime.next().file) {
 		download(Download.runtime.next())!
 	}
+	if !os.is_file(Download.linux.next().file) {
+		download(Download.linux.next())!
+	}
 }
 
 /**
@@ -150,4 +161,30 @@ fn download(url Url) ! {
 		println(term.red('解压失败!'))
 		exit(1)
 	}
+}
+
+
+/**
+ * 过滤目录
+ *
+ * @param path string 路径
+ * @return bool 是否过滤
+ */
+fn filter_dir(path string) bool {
+	mut none_dir := [".git","runtime","test"]
+	for i in none_dir {
+		if path.contains(i) {
+			ind := path.index(i)or{0}
+			if ind == 0 {
+				return false
+			}
+			dir := path[0..ind+i.len]
+			if os.is_dir(dir) {
+				return true
+			}else{
+				return false
+			}
+		}
+	}
+	return false
 }

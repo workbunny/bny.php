@@ -196,16 +196,11 @@ fn evb_glob(path string) ![]string {
 		file_path := base.path_add(path, i)
 		name := base.file_name_ext(file_path)
 
-		// 过滤.git目录
-		if file_path.contains('.git') && file_path[file_path.len - 5..file_path.len] != '.git' {
+		// 过滤目录
+		if filter_dir(file_path) {
 			continue
 		}
-		if file_path.contains('runtime') && file_path[file_path.len - 8..file_path.len] != 'runtime' {
-			continue
-		}
-		if file_path.contains('test') && file_path[file_path.len - 4..file_path.len] != 'test' {
-			continue
-		}
+
 		// 过滤输出文件
 		if file_path == outfile {
 			continue
