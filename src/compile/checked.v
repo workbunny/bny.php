@@ -73,9 +73,9 @@ pub fn (dl Download) next() Url {
 		}
 		.linux {
 			return Url{
-				name: 'linux.zip'
+				name: 'linux-${base.get_machine()}.zip'
 				path: '/script'
-				file: base.path_add(base.Dirs{}.script, 'linux')
+				file: base.path_add(base.Dirs{}.script, 'linux-${base.get_machine()}')
 			}
 		}
 	}
