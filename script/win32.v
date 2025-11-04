@@ -23,12 +23,11 @@ fn main() {
 		// 读取 bny.json
 		bny := json.decode(BnyConfig, os.read_file('bny.json')!)!
 		args[0] = bny.main
-		if bny.ini_path != '' {
-			args << '-c'
-			args << bny.ini_path
-		}
 		if bny.php_ins.len > 0 {
-			args << bny.php_ins
+			args.insert(0,bny.php_ins)
+		}
+		if bny.ini_path != '' {
+			args.insert(0,['-c',bny.ini_path])
 		}
 	}else{
 		args[0] = 'index.php'
