@@ -86,11 +86,11 @@ fn to_dir(item common.PhpList) ! {
 	}
 	os.rm(item.path)!
 	mut info := common.get_info()!
-	info.php = info.php_list.len - 1
 	info.php_list << common.PhpList{
 		name: item.name
 		path: dir
 	}
+	info.php = info.php_list.len - 1
 	common.set_info(info)!
 	println(term.green('添加成功!'))
 }

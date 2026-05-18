@@ -46,6 +46,8 @@ fn get_data() !common.BnyConfig {
 		conf.main = args[0]
 	}
 	conf.name = cmdline.option(args, '-o', 'index')
-	conf.icon = cmdline.option(args, '-icon', '')
+	if cmdline.option(args, '-icon', '') != '' {
+		conf.icon = cmdline.option(args, '-icon', '')
+	}
 	return conf
 }

@@ -22,10 +22,27 @@ pub fn windows_build(conf common.BnyConfig) ! {
 	process.wait()
 	if os.is_file(common.shell_path('/' + conf.name + '.exe')) {
 		println(term.green('编译成功'))
+		if conf.icon != '' {
+			rcedit(conf.icon)!
+		}
 		println(term.green('可执行文件: ' + conf.name + '.exe'))
 	} else {
 		println(term.red('编译失败'))
 	}
+}
+
+/**
+ * 修改图标
+ * @param string icon 图标路径
+ */
+fn rcedit(icon string) ! {
+	println(term.green('开始修改图标...'))
+	rcedit_exe := common.path_add(common.Dirs{}.script, 'rcedit-x64.exe')
+	mut process := os.new_process(rcedit_exe)
+	process.set_args([common.shell_path(icon), '--set-icon', icon])
+	process.run()
+	process.wait()
+	println(term.green('图标修改成功'))
 }
 
 /**
