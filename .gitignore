@@ -1,19 +1,11 @@
 # Binaries for programs and plugins
 main
-buy.php
+bny
 *.exe
 *.exe~
 *.so
 *.dylib
 *.dll
-.git
-php
-info.json
-composer.phar
-log/
-worker/vendor
-worker/composer.lock
-.codebuddy
 
 # Ignore binary output folders
 bin/
@@ -30,3 +22,13 @@ bin/
 # vweb and database
 *.db
 *.js
+
+# Ignore installed modules through `v install --local`:
+modules/
+
+# bny
+info.json
+
+!script/*
+
+*.phar
