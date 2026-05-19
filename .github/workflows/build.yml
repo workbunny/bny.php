@@ -1,0 +1,189 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Select platform to build'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - windows-x64
+          - linux-x64
+          - linux-arm64
+          - macos-arm64
+
+jobs:
+
+  build-windows-x64:
+    runs-on: windows-latest
+    name: Build Windows x86_64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install V
+        run: |
+          curl -fsSL https://github.com/vlang/v/releases/latest/download/v_windows.zip -o v.zip
+          Expand-Archive -Force v.zip -DestinationPath C:\v
+          $env:PATH = "C:\v;$env:PATH"
+          C:\v\v.exe version
+
+      - name: Build bny
+        run: C:\v\v.exe -os windows . -o bny.exe
+
+      - name: Build cli tools
+        run: |
+          C:\v\v.exe -os windows script/cli.v -o script/cli.exe 
+          C:\v\v.exe -os windows script/win32.v -o script/win32.exe
+
+      - name: Prepare release package
+        run: |
+          New-Item -ItemType Directory -Force -Path bny/script
+          Copy-Item bny.exe bny/
+          Copy-Item icon.png bny/ -ErrorAction SilentlyContinue
+          Copy-Item README.md bny/
+          Copy-Item script/enigmavbconsole.exe bny/script/
+          Copy-Item script/rcedit-x64.exe bny/script/
+          Copy-Item script/cli.exe bny/script/
+          Copy-Item script/win32.exe bny/script/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bny-windows-x86_64
+          path: bny
+          if-no-files-found: error
+
+  build-linux-x64:
+    runs-on: ubuntu-latest
+    name: Build Linux x86_64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install V
+        run: |
+          git clone --depth=1 https://github.com/vlang/v
+          cd v
+          make
+          sudo ./v symlink
+
+      - name: Build bny
+        run: v -os linux . -o bny
+
+      - name: Build cli
+        run: |
+          v -os linux script/cli.v -o script/cli
+
+      - name: Prepare release package
+        run: |
+          mkdir -p bny/script
+          cp bny bny/
+          cp icon.png bny/ -ErrorAction SilentlyContinue
+          cp README.md bny/
+          cp script/appimagetool-x86_64.AppImage bny/script/
+          cp script/runtime-x86_64 bny/script/
+          cp script/cli bny/script/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bny-linux-x86_64
+          path: bny
+          if-no-files-found: error
+
+  build-linux-arm64:
+    runs-on: Ubuntu-24.04-arm
+    name: Build Linux aarch64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install V
+        run: |
+          git clone --depth=1 https://github.com/vlang/v
+          cd v
+          make
+          sudo ./v symlink
+
+      - name: Build bny
+        run: v -os linux . -o bny
+
+      - name: Build cli
+        run: |
+          v -os linux script/cli.v -o script/cli
+
+      - name: Prepare release package
+        run: |
+          mkdir -p bny/script
+          cp bny bny/
+          cp icon.png bny/ -ErrorAction SilentlyContinue
+          cp README.md bny/
+          cp script/appimagetool-aarch64.AppImage bny/script/
+          cp script/runtime-aarch64 bny/script/
+          cp script/cli bny/script/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bny-linux-aarch64
+          path: bny
+          if-no-files-found: error
+
+  build-macos-arm64:
+    runs-on: macos-latest
+    name: Build macOS arm64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install V
+        run: |
+          git clone --depth=1 https://github.com/vlang/v
+          cd v
+          make
+          sudo ./v symlink
+
+      - name: Build bny
+        run: v -os macos . -o bny
+
+      - name: Prepare release package
+        run: |
+          mkdir -p bny
+          cp bny bny/
+          cp icon.png bny/ -ErrorAction SilentlyContinue
+          cp README.md bny/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bny-macos-arm64
+          path: bny
+          if-no-files-found: error
+
+  release:
+    needs: [build-windows-x64, build-linux-x64, build-linux-arm64, build-macos-arm64]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Create Release
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/**/*
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

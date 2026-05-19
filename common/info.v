@@ -64,13 +64,38 @@ pub fn get_info() !Info {
 				},
 			]
 			linux:   Arch{
-				x86_64: [
+				x86_64:  [
 					Url{
 						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.4-linux-x86_64-glibc.zip'
 						name: '8.4'
 					},
+					Url{
+						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.3-linux-x86_64-glibc.zip'
+						name: '8.3'
+					},
+					Url{
+						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.2-linux-x86_64-glibc.zip'
+						name: '8.2'
+					},
+				]
+				aarch64: [
+					Url{
+						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.4-linux-aarch64-glibc.zip'
+						name: '8.4'
+					},
+					Url{
+						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.3-linux-aarch64-glibc.zip'
+						name: '8.3'
+					},
+					Url{
+						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.2-linux-aarch64-glibc.zip'
+						name: '8.2'
+					},
 				]
 			}
+			macos :[
+				
+			]
 		}
 	}
 	path := app_path('/info.json')

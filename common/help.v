@@ -39,6 +39,7 @@ fn dump_version() ! {
 fn dump_help_all() ! {
 	info := get_info()! // 配置信息
 	mut str := logo() // logo
+	clean_size := size_format(path_size(Dirs{}.cache)!)
 	// 版本
 	mut version := term.green('Bny: ')
 	version += info.version + ' '
@@ -46,6 +47,7 @@ fn dump_help_all() ! {
 	version += if info.php > -1 { '已安装 ' } else { term.red('未安装 ') }
 	version += term.green('Composer: ')
 	version += if os.is_file(Composer{}.path) { '已安装 ' } else { term.red('未安装 ') }
+	version += term.green('缓存: ') + term.red(clean_size) + '\n'
 	str << version
 	// 用法
 	mut usage := term.yellow('用法: \n')

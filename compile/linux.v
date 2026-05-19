@@ -19,7 +19,7 @@ pub fn linux_build(conf common.BnyConfig) ! {
 		project,
 		'--runtime-file',
 		runtime,
-		'--output',
+		'-n',
 		common.shell_path(conf.name + '.bin'),
 	])
 	p.env << 'ARCH=' + arch
@@ -63,7 +63,8 @@ fn create_cache_project(conf common.BnyConfig) !string {
 	mut apprun_file := []string{}
 	apprun_file << '#! /usr/bin/env bash'
 	apprun_file << 'dir=$(dirname $(realpath $0))' // 获取当前目录
-	apprun_file << 'exec \$dir"/usr/bin/cli" $@' // 执行cli文件
+	apprun_file << 'cd \$dir"/usr/bin/"'
+	apprun_file << 'exec "./cli" $@' // 执行cli文件
 	// 保存至dir/AppRun文件
 	os.write_file(common.path_add(dir, 'AppRun'), apprun_file.join('\n'))!
 
@@ -111,7 +112,8 @@ fn create_cache_project(conf common.BnyConfig) !string {
 			continue
 		}
 		println('[打包]:'+ common.path_add(common.shell_path(none), i))
-		os.cp_all(common.path_add(common.shell_path(none), i), common.path_add(dir, i), true)!
+		println('[编译]:'+ common.path_add(dir,'usr','bin', i))
+		os.cp_all(common.path_add(common.shell_path(none), i), common.path_add(dir,'usr','bin', i), true)!
 	}
 	println('文件夹:${dir}')
 	common.chmod_all(dir, 0o777)!
