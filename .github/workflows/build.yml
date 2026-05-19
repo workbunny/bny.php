@@ -164,25 +164,3 @@ jobs:
           name: bny-macos-arm64
           path: release
           if-no-files-found: error
-
-  release:
-    needs: [build-windows-x64, build-linux-x64, build-linux-arm64, build-macos-arm64]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    name: Create Release
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Display structure of downloaded files
-        run: ls -R artifacts
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: artifacts/**/*
-          draft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
