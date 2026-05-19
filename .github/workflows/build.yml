@@ -32,12 +32,13 @@ jobs:
           Expand-Archive -Force v.zip -DestinationPath C:\v
 
       - name: Build bny
-        run: C:\v\v.exe -os windows . -o bny.exe
+        run: |
+          & C:\v\v.exe -os windows . -o bny.exe
 
       - name: Build cli tools
         run: |
-          C:\v\v.exe -os windows script/cli.v -o script/cli.exe 
-          C:\v\v.exe -os windows script/win32.v -o script/win32.exe
+          & C:\v\v.exe -os windows script/cli.v -o script/cli.exe
+          & C:\v\v.exe -os windows script/win32.v -o script/win32.exe
 
       - name: Prepare release package
         run: |
@@ -82,7 +83,7 @@ jobs:
         run: |
           mkdir -p release/script
           cp bny release/
-          cp icon.png release/ -ErrorAction SilentlyContinue
+          cp icon.png release/ || true
           cp README.md release/
           cp script/appimagetool-x86_64.AppImage release/script/
           cp script/runtime-x86_64 release/script/
@@ -120,7 +121,7 @@ jobs:
         run: |
           mkdir -p release/script
           cp bny release/
-          cp icon.png release/ -ErrorAction SilentlyContinue
+          cp icon.png release/ || true
           cp README.md release/
           cp script/appimagetool-aarch64.AppImage release/script/
           cp script/runtime-aarch64 release/script/
@@ -154,7 +155,7 @@ jobs:
         run: |
           mkdir -p release
           cp bny release/
-          cp icon.png release/ -ErrorAction SilentlyContinue
+          cp icon.png release/ || true
           cp README.md release/
 
       - name: Upload artifact
