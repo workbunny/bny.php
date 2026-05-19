@@ -93,8 +93,23 @@ pub fn get_info() !Info {
 					},
 				]
 			}
-			macos :[
-				
+			macos:   [
+				Url{
+					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.4-macos-aarch64.zip'
+					name: '8.4'
+				},
+				Url{
+					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.3-macos-aarch64.zip'
+					name: '8.3'
+				},
+				Url{
+					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.2-macos-aarch64.zip'
+					name: '8.2'
+				},
+				Url{
+					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.1-macos-aarch64.zip'
+					name: '8.1'
+				},
 			]
 		}
 	}

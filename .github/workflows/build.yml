@@ -30,8 +30,6 @@ jobs:
         run: |
           curl -fsSL https://github.com/vlang/v/releases/latest/download/v_windows.zip -o v.zip
           Expand-Archive -Force v.zip -DestinationPath C:\v
-          $env:PATH = "C:\v;$env:PATH"
-          C:\v\v.exe version
 
       - name: Build bny
         run: C:\v\v.exe -os windows . -o bny.exe
@@ -43,20 +41,20 @@ jobs:
 
       - name: Prepare release package
         run: |
-          New-Item -ItemType Directory -Force -Path bny/script
-          Copy-Item bny.exe bny/
-          Copy-Item icon.png bny/ -ErrorAction SilentlyContinue
-          Copy-Item README.md bny/
-          Copy-Item script/enigmavbconsole.exe bny/script/
-          Copy-Item script/rcedit-x64.exe bny/script/
-          Copy-Item script/cli.exe bny/script/
-          Copy-Item script/win32.exe bny/script/
+          New-Item -ItemType Directory -Force -Path release/script
+          Copy-Item bny.exe release/
+          Copy-Item icon.png release/ -ErrorAction SilentlyContinue
+          Copy-Item README.md release/
+          Copy-Item script/enigmavbconsole.exe release/script/
+          Copy-Item script/rcedit-x64.exe release/script/
+          Copy-Item script/cli.exe release/script/
+          Copy-Item script/win32.exe release/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bny-windows-x86_64
-          path: bny
+          path: release
           if-no-files-found: error
 
   build-linux-x64:
@@ -82,19 +80,19 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p bny/script
-          cp bny bny/
-          cp icon.png bny/ -ErrorAction SilentlyContinue
-          cp README.md bny/
-          cp script/appimagetool-x86_64.AppImage bny/script/
-          cp script/runtime-x86_64 bny/script/
-          cp script/cli bny/script/
+          mkdir -p release/script
+          cp bny release/
+          cp icon.png release/ -ErrorAction SilentlyContinue
+          cp README.md release/
+          cp script/appimagetool-x86_64.AppImage release/script/
+          cp script/runtime-x86_64 release/script/
+          cp script/cli release/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bny-linux-x86_64
-          path: bny
+          path: release
           if-no-files-found: error
 
   build-linux-arm64:
@@ -120,19 +118,19 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p bny/script
-          cp bny bny/
-          cp icon.png bny/ -ErrorAction SilentlyContinue
-          cp README.md bny/
-          cp script/appimagetool-aarch64.AppImage bny/script/
-          cp script/runtime-aarch64 bny/script/
-          cp script/cli bny/script/
+          mkdir -p release/script
+          cp bny release/
+          cp icon.png release/ -ErrorAction SilentlyContinue
+          cp README.md release/
+          cp script/appimagetool-aarch64.AppImage release/script/
+          cp script/runtime-aarch64 release/script/
+          cp script/cli release/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bny-linux-aarch64
-          path: bny
+          path: release
           if-no-files-found: error
 
   build-macos-arm64:
@@ -154,16 +152,16 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p bny
-          cp bny bny/
-          cp icon.png bny/ -ErrorAction SilentlyContinue
-          cp README.md bny/
+          mkdir -p release
+          cp bny release/
+          cp icon.png release/ -ErrorAction SilentlyContinue
+          cp README.md release/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bny-macos-arm64
-          path: bny
+          path: release
           if-no-files-found: error
 
   release:
