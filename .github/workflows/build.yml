@@ -30,16 +30,15 @@ jobs:
         run: |
           curl -fsSL https://github.com/vlang/v/releases/latest/download/v_windows.zip -o v.zip
           Expand-Archive -Force v.zip -DestinationPath C:\v
-          Get-ChildItem C:\v -Recurse | Select-Object FullName
 
       - name: Build bny
         run: |
-          & C:\v\v.exe -os windows . -o bny.exe
+          & C:\v\v\v.exe -os windows . -o bny.exe
 
       - name: Build cli tools
         run: |
-          & C:\v\v.exe -os windows script/cli.v -o script/cli.exe
-          & C:\v\v.exe -os windows script/win32.v -o script/win32.exe
+          & C:\v\v\v.exe -os windows script/cli.v -o script/cli.exe
+          & C:\v\v\v.exe -os windows script/win32.v -o script/win32.exe
 
       - name: Prepare release package
         run: |
