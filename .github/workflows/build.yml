@@ -30,6 +30,7 @@ jobs:
         run: |
           curl -fsSL https://github.com/vlang/v/releases/latest/download/v_windows.zip -o v.zip
           Expand-Archive -Force v.zip -DestinationPath C:\v
+          Get-ChildItem C:\v -Recurse | Select-Object FullName
 
       - name: Build bny
         run: |
