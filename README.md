@@ -39,21 +39,14 @@ Bny: v0.0.0 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
 - PHP 版本管理，支持多版本切换
 - 项目一键编译，将 PHP CLI 项目打包为单个可执行文件
 - 内置 Composer 支持
-- 跨平台支持 (Windows / Linux / macOS)
 
-## 功能概览
+## 平台支持
 
-| 功能 | 说明 |
-|------|------|
-| `run` | 运行 PHP 项目或脚本 |
-| `php` | 直接运行 PHP 命令 |
-| `composer` | 运行 Composer 包管理器 |
-| `compile` | 将项目编译为独立可执行文件 |
-| `add` | 下载并安装指定 PHP 版本 |
-| `search` | 搜索可用的 PHP 版本 |
-| `lists` | 查看已安装的 PHP 版本列表 |
-| `delete` | 删除指定的 PHP 版本 |
-| `clean` | 清理缓存目录 |
+| 平台 | 架构 | 状态 |
+|------|------|------|
+| Windows | x86_64 | 已支持 |
+| Linux | x86_64, aarch64 | 已支持 |
+| macOS | arm64 | 已支持 |
 
 ## 快速开始
 
@@ -131,15 +124,13 @@ bny clean
 | `define` | array | PHP 运行参数，与 `php -d` 相同 |
 | `ignore` | array | 打包时忽略的文件或文件夹 |
 
-## 平台支持
+### 编译说明
 
-| 平台 | 架构 | 状态 |
-|------|------|------|
-| Windows | x86_64 | 已支持 |
-| Linux | x86_64, aarch64 | 已支持 |
-| macOS | arm64 | 已支持 |
+- Windows 是采用 `EVB` 进行封包, `内存运行` ，安全指数：⭐⭐⭐⭐ 
+- Linux 是采用 `AppImage` 进行封包, `解压运行` ，安全指数：无 
+- MacOs 暂不支持封包
 
-### Linux AppImage 运行要求
+### Linux compile 运行/打包要求
 
 ```sh
 apt install -y file
@@ -152,11 +143,22 @@ export APPIMAGE_EXTRACT_AND_RUN=1
 
 ```json
 {
-    "url": {
+    "php": 1, // 已经启动的php版本 从0开始选择php_list序列
+    "php_list": [ // 已经安装的php版本，可手动添加和修改
+        {
+            "path": "...",
+            "name": "8.4"
+        },
+        {
+            "path": "...",
+            "name": "8.3"
+        }
+    ],
+    "url": { // 默认下载源，可手动添加和修改
         "windows": [
             {"name": "8.5", "url": "https://..."}
         ],
-        "linux": {
+        "linux": { // linux 和 macos 最好采用 static-php-cli 
             "x86_64": [
                 {"name": "8.4", "url": "https://..."}
             ],
@@ -166,8 +168,6 @@ export APPIMAGE_EXTRACT_AND_RUN=1
     }
 }
 ```
-
-支持的平台：`windows`、`linux` (x86_64/aarch64)、`macos`
 
 ## 许可证
 
