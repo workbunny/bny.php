@@ -26,6 +26,7 @@ Bny: v0.0.0 PHP: 已安装 Composer: 已安装 2025-07-19 09:50:12
   delete                删除php版本
   lists                 查看已安装的php
   clean                 清理缓存垃圾
+  mirror                更新代理
 
 
 选项:
