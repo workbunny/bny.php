@@ -52,8 +52,13 @@ fn download(name string) !common.PhpList {
 		exit(1)
 	}
 	println(term.dim('正在下载,请耐心等待...'))
-	res := http.download_file_with_progress(sele_url.url, common.path_add(dir_path, '${name}.zip'),
-		http.DownloaderParams{}) or {
+	info := common.get_info()!
+	res := http.download_file_with_progress(info.mirror + sele_url.url, common.path_add(dir_path, '${name}.zip'),
+		http.DownloaderParams{
+		FetchConfig: http.FetchConfig{
+			allow_redirect: true
+		}
+	}) or {
 		println(term.red('下载文件失败,未知错误~'))
 		exit(1)
 	}

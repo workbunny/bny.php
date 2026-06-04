@@ -64,12 +64,13 @@ fn dump_help_all() ! {
 	commands += term.green('  lists                 ') + '查看已安装的php\n'
 	commands += term.green('  delete                ') + '删除php版本\n'
 	commands += term.green('  clean                 ') + '清理缓存\n'
+	commands += term.green('  mirror                ') + '更新代理\n'
 	commands += '\n'
 	str << commands
 	// 选项
 	mut opt := term.yellow('选项: \n')
-	opt += term.green('  -h                      ') + '显示帮助信息\n'
-	opt += term.green('  -v                      ') + '显示版本信息\n'
+	opt += term.green('  -h                    ') + '显示帮助信息\n'
+	opt += term.green('  -v                    ') + '显示版本信息\n'
 	str << opt
 	println(str.join('\n'))
 }
@@ -111,6 +112,18 @@ fn dump_help_php_delete() ! {
 }
 
 /**
+ * 打印代理帮助信息
+ *
+ * @return !void
+ */
+fn dump_help_mirror() ! {
+	info := get_info()!
+	println(term.yellow('切换代理:'))
+	println(term.green('  ${info.name} mirror up             ') + '更新代理\n')
+	println(term.green('  ${info.name} mirror none           ') + '清除代理\n')
+}
+
+/**
  * 打印运行帮助信息
  *
  * @return !void
@@ -134,7 +147,7 @@ fn dump_help_run() ! {
 }
 
 fn dump_help_compile() ! {
-	info := common.get_info()!
+	info := get_info()!
 	mut arr := []string{}
 	arr << term.yellow('用法:')
 	arr << ''
@@ -174,6 +187,7 @@ pub fn dump(str string) ! {
 		'php-delete' { dump_help_php_delete()! }
 		'php-add' { dump_help_php_add()! }
 		'version' { dump_version()! }
+		'mirror' { dump_help_mirror()! }
 		else { dump_help_all()! }
 	}
 }
