@@ -31,7 +31,7 @@ pub:
 pub struct Info {
 pub mut:
 	name     string = 'bny'
-	version  string = 'v0.0.8'
+	version  string = 'v0.1.0'
 	mirror   string
 	php      int = -1
 	php_list []PhpList
