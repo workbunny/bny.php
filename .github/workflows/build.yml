@@ -33,7 +33,7 @@ jobs:
 
       - name: Install mingw-w64
         run: |
-          curl -fsSL https://github.com/niXman/mingw-builds-binaries/releases/download/13.2.0-rt_v11-rev0/x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z -o mingw.7z
+          Invoke-WebRequest -Uri "https://github.com/niXman/mingw-builds-binaries/releases/download/13.2.0-rt_v11-rev0/x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z" -OutFile mingw.7z
           Expand-Archive -Force mingw.7z -DestinationPath C:\
           Rename-Item -Path C:\x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0 -NewName mingw64 -Force
           echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
