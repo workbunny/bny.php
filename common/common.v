@@ -1,6 +1,8 @@
 module common
 
 import os
+import json
+import os.cmdline
 
 pub struct Composer {
 pub:
@@ -22,6 +24,31 @@ pub mut:
 	ini    string   // 配置文件或者目录
 	define []string // 定义 和 php -d 一样
 	ignore []string = ['runtime/', '.git/', 'test/'] // 忽略的文件或者文件夹 用于打包
+}
+
+/**
+ * 获取配置信息
+ *
+ * @return BnyConfig 配置信息
+ */
+pub fn get_bny_config() !BnyConfig {
+	mut args := get_args()
+	args.delete(0)
+	mut conf := BnyConfig{}
+	if args[0] == '.' {
+		if os.is_file('bny.json'){
+			mut file := os.read_file('bny.json')!
+			conf = json.decode(BnyConfig, file)!
+		} else {
+			conf.name = 'index'
+		}
+	} else {
+		conf.main = args[0]
+	}
+	if cmdline.option(args, '-icon', '') != '' {
+		conf.icon = cmdline.option(args, '-icon', '')
+	}
+	return conf
 }
 
 /**

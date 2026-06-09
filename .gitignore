@@ -32,3 +32,4 @@ info.json
 !script/*
 
 *.phar
+cache/

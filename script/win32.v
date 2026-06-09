@@ -24,6 +24,7 @@ fn main() {
 	}
 	php_file := '.' + os.path_separator + 'php' + os.path_separator + file
 	mut args := os.args.clone()
+	args.delete(0)
 	if !os.exists(php_file) {
 		error('php 文件不存在')
 	}

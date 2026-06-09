@@ -3,7 +3,6 @@ module worker
 import common
 import php
 import os
-import json
 
 pub fn run() ! {
 	php.run_checked()!
@@ -14,15 +13,18 @@ pub fn run() ! {
 	} else {
 		name := args[0]
 		php_path := php.get_path()!
-		if os.file_ext(name) == '.json' {
-			config := json.decode(common.BnyConfig, os.read_file(name)!)!
-			args[0] = config.main
-			if config.ini != '' {
-				args << ['-c', config.ini]
+		if name == '.' {
+			bny_conf := common.get_bny_config()!
+			if bny_conf.main != '' {
+				args[0] = bny_conf.main
 			}
-			for v in config.define {
-				args << ['-d', v]
+			if bny_conf.ini != '' {
+				args.prepend(['-c', bny_conf.ini])
 			}
+			for v in bny_conf.define {
+				args.prepend(['-d', v])
+			}
+			println(args)
 		}
 		mut process := os.new_process(php_path)
 		process.set_args(args)
