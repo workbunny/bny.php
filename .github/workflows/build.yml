@@ -44,7 +44,7 @@ jobs:
       
       - name: Set bny.exe icon
         run: |
-          & script/rcedit-x64.exe bny.exe --set-icon icon.png
+          & script/rcedit-x64.exe bny.exe --set-icon icon.ico
 
       - name: Build cli tools
         run: |
