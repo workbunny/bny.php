@@ -31,10 +31,12 @@ jobs:
           curl -fsSL https://github.com/vlang/v/releases/latest/download/v_windows.zip -o v.zip
           Expand-Archive -Force v.zip -DestinationPath C:\v
 
-      - name: Install mingw64
+      - name: Install mingw-w64
         run: |
-          choco install mingw64 -y
-          echo "C:\tools\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          curl -fsSL https://github.com/niXman/mingw-builds-binaries/releases/download/13.2.0-rt_v11-rev0/x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z -o mingw.7z
+          Expand-Archive -Force mingw.7z -DestinationPath C:\
+          Rename-Item -Path C:\x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0 -NewName mingw64 -Force
+          echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build bny
         run: |
@@ -47,14 +49,14 @@ jobs:
 
       - name: Prepare release package
         run: |
-          New-Item -ItemType Directory -Force -Path release/script
-          Copy-Item bny.exe release/
-          Copy-Item icon.png release/ -ErrorAction SilentlyContinue
-          Copy-Item README.md release/
-          Copy-Item script/enigmavbconsole.exe release/script/
-          Copy-Item script/rcedit-x64.exe release/script/
-          Copy-Item script/cli.exe release/script/
-          Copy-Item script/win32.exe release/script/
+          New-Item -ItemType Directory -Force -Path release/bny/script
+          Copy-Item bny.exe release/bny/
+          Copy-Item icon.png release/bny/ -ErrorAction SilentlyContinue
+          Copy-Item README.md release/bny/
+          Copy-Item script/enigmavbconsole.exe release/bny/script/
+          Copy-Item script/rcedit-x64.exe release/bny/script/
+          Copy-Item script/cli.exe release/bny/script/
+          Copy-Item script/win32.exe release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -86,13 +88,13 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p release/script
-          cp bny release/
-          cp icon.png release/ || true
-          cp README.md release/
-          cp script/appimagetool-x86_64.AppImage release/script/
-          cp script/runtime-x86_64 release/script/
-          cp script/cli release/script/
+          mkdir -p release/bny/script
+          cp bny release/bny/
+          cp icon.png release/bny/ || true
+          cp README.md release/bny/
+          cp script/appimagetool-x86_64.AppImage release/bny/script/
+          cp script/runtime-x86_64 release/bny/script/
+          cp script/cli release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -124,13 +126,13 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p release/script
-          cp bny release/
-          cp icon.png release/ || true
-          cp README.md release/
-          cp script/appimagetool-aarch64.AppImage release/script/
-          cp script/runtime-aarch64 release/script/
-          cp script/cli release/script/
+          mkdir -p release/bny/script
+          cp bny release/bny/
+          cp icon.png release/bny/ || true
+          cp README.md release/bny/
+          cp script/appimagetool-aarch64.AppImage release/bny/script/
+          cp script/runtime-aarch64 release/bny/script/
+          cp script/cli release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -158,10 +160,10 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p release
-          cp bny release/
-          cp icon.png release/ || true
-          cp README.md release/
+          mkdir -p release/bny
+          cp bny release/bny/
+          cp icon.png release/bny/ || true
+          cp README.md release/bny/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
