@@ -68,7 +68,7 @@ jobs:
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../bny.exe php -d extension=ffi -d ffi.enable=true ../../composer.phar require kingbes/pebview
+          ../../../bny.exe php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
           ../../../bny.exe compile . -o pebview.exe -noterm true
 
       - name: Prepare release package
