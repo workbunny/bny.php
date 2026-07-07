@@ -113,6 +113,9 @@ jobs:
       - name: Add composer
         run: ./bny composer
 
+      - name: Configure composer mirror
+        run: ./bny php ./composer.phar config repo.packagist composer https://mirrors.aliyun.com/composer/
+
       - name: Compile webman project
         run: |
           mkdir -p test/cli
@@ -170,6 +173,9 @@ jobs:
       
       - name: Add composer
         run: ./bny composer
+
+      - name: Configure composer mirror
+        run: ./bny php ./composer.phar config repo.packagist composer https://mirrors.aliyun.com/composer/
 
       - name: Compile webman project
         run: |
