@@ -15,7 +15,6 @@ on:
           - windows-x64
           - linux-x64
           - linux-arm64
-          - macos-arm64
 
 jobs:
 
@@ -53,6 +52,9 @@ jobs:
 
       - name: Add PHP 8.2
         run: ./bny.exe add 8.2
+      
+      - name: Add composer
+        run: ./bny.exe composer
 
       - name: Compile webman project
         run: |
@@ -103,14 +105,17 @@ jobs:
       - name: Build cli
         run: v -os linux script/cli.v -o script/cli
 
-      - name: Add PHP 8.4
-        run: ./bny add 8.4
+      - name: Add PHP 8.2
+        run: ./bny add 8.2
+
+      - name: Add composer
+        run: ./bny composer
 
       - name: Compile webman project
         run: |
           mkdir -p test/cli
           cd test/cli
-          ../../bny php -d extension=openssl ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
+          ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
           cp webman/linux.php webman/index.php
           cd webman
           chmod +x ../../../../bny
@@ -149,14 +154,17 @@ jobs:
       - name: Build cli
         run: v -os linux script/cli.v -o script/cli
 
-      - name: Add PHP 8.4
-        run: ./bny add 8.4
+      - name: Add PHP 8.2
+        run: ./bny add 8.2
+      
+      - name: Add composer
+        run: ./bny composer
 
       - name: Compile webman project
         run: |
           mkdir -p test/cli
           cd test/cli
-          ../../bny php -d extension=openssl ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
+          ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
           cp webman/linux.php webman/index.php
           cd webman
           chmod +x ../../../../bny
@@ -171,48 +179,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-linux-aarch64
-          path: release
-          if-no-files-found: error
-
-  build-macos-arm64:
-    runs-on: macos-latest
-    name: Build macOS arm64
-    if: ${{ github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos-arm64' || github.event_name == 'push' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install V
-        run: |
-          git clone --depth=1 https://github.com/vlang/v
-          cd v
-          make
-          sudo ./v symlink
-
-      - name: Build bny
-        run: v -os macos . -o bny
-
-      - name: Add PHP 8.4
-        run: ./bny add 8.4
-
-      - name: Compile webman project
-        run: |
-          mkdir -p test/cli
-          cd test/cli
-          ../../bny php -d extension=openssl ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
-          cp webman/linux.php webman/index.php
-          cd webman
-          chmod +x ../../../../bny
-          ../../../../bny compile . -o webman
-
-      - name: Prepare release package
-        run: |
-          mkdir -p release/test
-          cp test/cli/webman/webman release/test/
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-macos-arm64
           path: release
           if-no-files-found: error
