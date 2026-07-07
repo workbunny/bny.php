@@ -63,12 +63,12 @@ jobs:
           ../../bny.exe php -d extension=openssl ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
           Copy-Item webman/windows.php webman/index.php
           cd webman
-          ../../../../bny.exe compile . -o webman
+          ../../../bny.exe compile . -o webman
 
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../../bny.exe php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
+          ../../bny.exe php -d extension=ffi -d ffi.enable=true ../../composer.phar require kingbes/pebview
           ../../../bny.exe compile . -o pebview.exe -noterm true
 
       - name: Prepare release package
@@ -118,8 +118,8 @@ jobs:
           ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
           cp webman/linux.php webman/index.php
           cd webman
-          chmod +x ../../../../bny
-          ../../../../bny compile . -o webman
+          chmod +x ../../bny
+          ../../bny compile . -o webman
 
       - name: Prepare release package
         run: |
@@ -167,8 +167,8 @@ jobs:
           ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
           cp webman/linux.php webman/index.php
           cd webman
-          chmod +x ../../../../bny
-          ../../../../bny compile . -o webman
+          chmod +x ../../bny
+          ../../bny compile . -o webman
 
       - name: Prepare release package
         run: |
