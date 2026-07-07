@@ -117,7 +117,7 @@ jobs:
         run: |
           mkdir -p test/cli
           cd test/cli
-          ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction --repository-url=https://mirrors.aliyun.com/composer/
+          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
           cp webman/start.php webman/index.php
           cd webman
           chmod +x ../../bny
@@ -126,7 +126,7 @@ jobs:
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../../bny php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview --repository-url=https://mirrors.aliyun.com/composer/
+          ../../../bny composer require kingbes/pebview
           ../../../bny compile . -noterm true
 
       - name: Prepare release package
@@ -175,7 +175,7 @@ jobs:
         run: |
           mkdir -p test/cli
           cd test/cli
-          ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction --repository-url=https://mirrors.aliyun.com/composer/
+          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
           cp webman/start.php webman/index.php
           cd webman
           chmod +x ../../bny
@@ -184,7 +184,7 @@ jobs:
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../../bny php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview --repository-url=https://mirrors.aliyun.com/composer/
+          ../../../bny composer require kingbes/pebview
           ../../../bny compile . -noterm true
 
       - name: Prepare release package
