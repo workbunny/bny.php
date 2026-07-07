@@ -68,7 +68,7 @@ jobs:
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../../bny.exe php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
+          ../../../bny.exe php -d extension=ffi -d ffi.enable=true -d extension=openssl ../../../composer.phar require kingbes/pebview
           ../../../bny.exe compile . -o pebview.exe -noterm true
 
       - name: Prepare release package
@@ -116,15 +116,22 @@ jobs:
           mkdir -p test/cli
           cd test/cli
           ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
-          cp webman/linux.php webman/index.php
+          cp webman/start.php webman/index.php
           cd webman
           chmod +x ../../bny
           ../../bny compile . -o webman
+      
+      - name: Compile pebview project
+        run: |
+          cd test/gui/pebview
+          ../../../bny php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
+          ../../../bny compile . -o pebview -noterm true
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/cli/webman/webman release/test/
+          cp test/gui/pebview/pebview release/test/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -165,15 +172,22 @@ jobs:
           mkdir -p test/cli
           cd test/cli
           ../../bny php ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
-          cp webman/linux.php webman/index.php
+          cp webman/start.php webman/index.php
           cd webman
           chmod +x ../../bny
           ../../bny compile . -o webman
+        
+      - name: Compile pebview project
+        run: |
+          cd test/gui/pebview
+          ../../../bny php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
+          ../../../bny compile . -o pebview -noterm true
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/cli/webman/webman release/test/
+          cp test/gui/pebview/pebview release/test/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
