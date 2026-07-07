@@ -119,8 +119,9 @@ fn dump_help_php_delete() ! {
 fn dump_help_mirror() ! {
 	info := get_info()!
 	println(term.yellow('切换代理:'))
-	println(term.green('  ${info.name} mirror up             ') + '更新代理\n')
-	println(term.green('  ${info.name} mirror none           ') + '清除代理\n')
+	println(term.green('  ${info.name} mirror up             ') + '更新代理')
+	println(term.green('  ${info.name} mirror none           ') + '清除代理')
+	println(term.green('  ${info.name} mirror [url]        ') + '设置代理')
 }
 
 /**

@@ -1,0 +1,13 @@
+{
+    "name": "pebview",
+    "main": "index.php",
+    "define": [
+        "extension=ffi",
+        "ffi.enable=true"
+    ],
+    "ignore": [
+        "runtime/",
+        ".git/",
+        "test/"
+    ]
+}

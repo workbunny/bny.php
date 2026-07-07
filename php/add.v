@@ -97,6 +97,14 @@ fn to_dir(item common.PhpList) ! {
 	}
 	info.php = info.php_list.len - 1
 	common.set_info(info)!
+	if common.get_os_name()! == 'windows' {
+		// 复制php.ini
+		os.cp(common.app_path('/php/${item.name}/php.ini-development'), common.app_path('/php/${item.name}/php.ini'))!
+		// 修改php.ini中的 ;extension_dir = "ext"为extension_dir = "ext"
+		mut php_ini := os.read_file(common.app_path('/php/${item.name}/php.ini'))!
+		php_ini = php_ini.replace(';extension_dir = "ext"', 'extension_dir = "ext"')
+		os.write_file(common.app_path('/php/${item.name}/php.ini'), php_ini)!
+	}
 	println(term.green('添加成功!'))
 }
 

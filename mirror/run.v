@@ -14,14 +14,18 @@ pub fn run() ! {
 			info.mirror = ''
 			common.set_info(info)!
 		}
-		if args[0] == 'up' {
+		else if args[0] == 'up' {
 			println(term.blue('获取代理...'))
 			mut urls := get_proxies()!
-			urls = urls.filter(it != 'https://github.starrlzy.cn')
+			urls = urls.filter(it != 'https://github.starrlzy.cn').filter(it != 'https://github.tbedu.top')
 			best_url, _ := fastest_proxy(urls)!
 			info.mirror = best_url + '/'
 			common.set_info(info)!
 			println(term.green('代理设置成功: ') + term.blue(best_url))
+		} else if args[0].starts_with('https://') || args[0].starts_with('http://') {
+			info.mirror = args[0] + '/'
+			common.set_info(info)!
+			println(term.green('代理设置成功: ') + term.blue(args[0]))
 		}
 	}
 }
