@@ -69,7 +69,7 @@ jobs:
         run: |
           cd test/gui/pebview
           ../../../bny.exe php -d extension=ffi -d ffi.enable=true -d extension=openssl ../../../composer.phar require kingbes/pebview
-          ../../../bny.exe compile . -o pebview.exe -noterm true
+          ../../../bny.exe compile . -noterm true
 
       - name: Prepare release package
         run: |
@@ -125,7 +125,7 @@ jobs:
         run: |
           cd test/gui/pebview
           ../../../bny php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
-          ../../../bny compile . -o pebview -noterm true
+          ../../../bny compile . -noterm true
 
       - name: Prepare release package
         run: |
@@ -181,7 +181,7 @@ jobs:
         run: |
           cd test/gui/pebview
           ../../../bny php -d extension=ffi -d ffi.enable=true ../../../composer.phar require kingbes/pebview
-          ../../../bny compile . -o pebview -noterm true
+          ../../../bny compile . -noterm true
 
       - name: Prepare release package
         run: |

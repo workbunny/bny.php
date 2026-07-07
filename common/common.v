@@ -48,6 +48,9 @@ pub fn get_bny_config() !BnyConfig {
 	if cmdline.option(args, '-icon', '') != '' {
 		conf.icon = cmdline.option(args, '-icon', '')
 	}
+	if cmdline.option(args, '-o', '') != '' {
+		conf.ini = cmdline.option(args, '-o', '')
+	}
 	return conf
 }
 
