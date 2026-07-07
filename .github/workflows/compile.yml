@@ -108,7 +108,9 @@ jobs:
         run: v -os linux script/cli.v -o script/cli
 
       - name: Add PHP 8.2
-        run: ./bny add 8.2
+        run: |
+          ./bny add 8.2
+          ./bny php -m
 
       - name: Add composer
         run: ./bny composer
@@ -166,7 +168,9 @@ jobs:
         run: v -os linux script/cli.v -o script/cli
 
       - name: Add PHP 8.2
-        run: ./bny add 8.2
+        run: |
+          ./bny add 8.2
+          ./bny php -m
       
       - name: Add composer
         run: ./bny composer
