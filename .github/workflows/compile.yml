@@ -98,6 +98,8 @@ jobs:
           cd v
           make
           sudo ./v symlink
+          sudo apt update
+          sudo apt install curl
 
       - name: Build bny
         run: v -os linux . -o bny
@@ -154,6 +156,8 @@ jobs:
           cd v
           make
           sudo ./v symlink
+          sudo apt update
+          sudo apt install curl
 
       - name: Build bny
         run: v -os linux . -o bny
