@@ -54,7 +54,9 @@ jobs:
         run: ./bny.exe add 8.2
       
       - name: Add composer
-        run: ./bny.exe composer
+        run: |
+          ./bny.exe composer
+          ./bny.exe composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
 
       - name: Compile webman project
         run: |
@@ -115,7 +117,7 @@ jobs:
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer config -g --unset repos.packagist
+          ./bny composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
 
       - name: Compile webman project
         run: |
@@ -177,7 +179,7 @@ jobs:
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer config -g --unset repos.packagist
+          ./bny composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
 
       - name: Compile webman project
         run: |
