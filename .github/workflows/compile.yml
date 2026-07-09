@@ -119,7 +119,7 @@ jobs:
         run: |
           mkdir -p test/cli
           cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction --repository-url=https://packagist.phpcomposer.com
+          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
           cp webman/start.php webman/index.php
           cd webman
           chmod +x ../../bny
@@ -128,7 +128,7 @@ jobs:
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../../bny composer require kingbes/pebview --repository-url=https://packagist.phpcomposer.com
+          ../../../bny composer require kingbes/pebview
           ../../../bny compile . -noterm true
 
       - name: Prepare release package
@@ -179,7 +179,7 @@ jobs:
         run: |
           mkdir -p test/cli
           cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction --repository-url=https://packagist.phpcomposer.com
+          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
           cp webman/start.php webman/index.php
           cd webman
           chmod +x ../../bny
@@ -188,7 +188,7 @@ jobs:
       - name: Compile pebview project
         run: |
           cd test/gui/pebview
-          ../../../bny composer require kingbes/pebview --repository-url=https://packagist.phpcomposer.com
+          ../../../bny composer require kingbes/pebview
           ../../../bny compile . -noterm true
 
       - name: Prepare release package
