@@ -133,12 +133,18 @@ jobs:
           cd test/gui/pebview
           ../../../bny composer require kingbes/pebview
           ../../../bny compile . -noterm true
+      
+      - name: Compile demo project
+        run: |
+          cd test/cli/demo
+          ../../../bny compile .
+          ./index
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/cli/webman/webman release/test/
           cp test/gui/pebview/pebview release/test/
+          cp test/cli/demo/index release/test/index
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -184,7 +190,7 @@ jobs:
         run: |
           ./bny composer
           ./bny composer update --no-dev --classmap-authoritative
-          
+
       - name: Compile pebview project
         env:
           COMPOSER_PROCESS_TIMEOUT: 600
@@ -193,12 +199,18 @@ jobs:
           cd test/gui/pebview
           ../../../bny composer require kingbes/pebview
           ../../../bny compile . -noterm true
+      
+      - name: Compile demo project
+        run: |
+          cd test/cli/demo
+          ../../../bny compile .
+          ./index
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/cli/webman/webman release/test/
           cp test/gui/pebview/pebview release/test/
+          cp test/cli/demo/index release/test/index
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
