@@ -60,7 +60,6 @@ jobs:
 
       - name: Compile webman project
         run: |
-          mkdir -p test/cli
           cd test/cli
           ../../bny.exe php -d extension=openssl ../../composer.phar create-project workerman/webman:~2.0 --no-interaction
           Copy-Item webman/windows.php webman/index.php
@@ -138,13 +137,13 @@ jobs:
         run: |
           cd test/cli/demo
           ../../../bny compile .
-          ./index
+          ./index.bin
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/gui/pebview/pebview release/test/
-          cp test/cli/demo/index release/test/index
+          cp test/cli/demo/index.bin release/test/index.bin
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -204,13 +203,13 @@ jobs:
         run: |
           cd test/cli/demo
           ../../../bny compile .
-          ./index
+          ./index.bin
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/gui/pebview/pebview release/test/
-          cp test/cli/demo/index release/test/index
+          cp test/cli/demo/index.bin release/test/index.bin
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
