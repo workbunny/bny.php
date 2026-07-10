@@ -162,7 +162,7 @@ fn dump_help_compile() ! {
 	arr << ''
 	arr << term.yellow('指令:')
 	arr << ''
-	arr << term.green('  -noterm [true/false]        ') + '不显示终端窗口,默认false'
+	arr << term.green('  -noterm [yes/no]        ') + '不显示终端窗口,默认no'
 	arr << term.green('  -o [name]                   ') + '编译为指定文件名'
 	arr << term.green('  -icon [file]                ') + '编译为指定图标'
 	arr << ''
