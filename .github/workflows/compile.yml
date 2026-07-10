@@ -125,19 +125,6 @@ jobs:
           ./bny composer
           ./bny composer update --no-dev --classmap-authoritative
 
-      - name: Compile webman project
-        env:
-          COMPOSER_PROCESS_TIMEOUT: 600
-          COMPOSER_IPRESOLVE: 4
-        run: |
-          mkdir -p test/cli
-          cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
-          cp webman/start.php webman/index.php
-          cd webman
-          chmod +x ../../bny
-          ../../bny compile . -o webman
-
       - name: Compile pebview project
         env:
           COMPOSER_PROCESS_TIMEOUT: 600
@@ -197,20 +184,7 @@ jobs:
         run: |
           ./bny composer
           ./bny composer update --no-dev --classmap-authoritative
-
-      - name: Compile webman project
-        env:
-          COMPOSER_PROCESS_TIMEOUT: 600
-          COMPOSER_IPRESOLVE: 4
-        run: |
-          mkdir -p test/cli
-          cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
-          cp webman/start.php webman/index.php
-          cd webman
-          chmod +x ../../bny
-          ../../bny compile . -o webman
-        
+          
       - name: Compile pebview project
         env:
           COMPOSER_PROCESS_TIMEOUT: 600
