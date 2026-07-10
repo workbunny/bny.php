@@ -142,7 +142,7 @@ jobs:
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/gui/pebview/pebview release/test/
+          cp test/gui/pebview/pebview.bin release/test/
           cp test/cli/demo/index.bin release/test/index.bin
 
       - name: Upload artifact
@@ -208,8 +208,8 @@ jobs:
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/gui/pebview/pebview release/test/
-          cp test/cli/demo/index.bin release/test/index.bin
+          cp test/gui/pebview/pebview.bin release/test/
+          cp test/cli/demo/index.bin release/test/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
