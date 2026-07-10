@@ -120,6 +120,9 @@ jobs:
           ./bny composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
 
       - name: Compile webman project
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 600
+          COMPOSER_IPRESOLVE: 4
         run: |
           mkdir -p test/cli
           cd test/cli
@@ -130,6 +133,9 @@ jobs:
           ../../bny compile . -o webman
 
       - name: Compile pebview project
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 600
+          COMPOSER_IPRESOLVE: 4
         run: |
           cd test/gui/pebview
           ../../../bny composer require kingbes/pebview
@@ -182,6 +188,9 @@ jobs:
           ./bny composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
 
       - name: Compile webman project
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 600
+          COMPOSER_IPRESOLVE: 4
         run: |
           mkdir -p test/cli
           cd test/cli
@@ -192,6 +201,9 @@ jobs:
           ../../bny compile . -o webman
         
       - name: Compile pebview project
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 600
+          COMPOSER_IPRESOLVE: 4
         run: |
           cd test/gui/pebview
           ../../../bny composer require kingbes/pebview
