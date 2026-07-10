@@ -117,7 +117,7 @@ jobs:
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
+          ./bny composer update --no-dev --classmap-authoritative
 
       - name: Compile webman project
         env:
@@ -185,7 +185,7 @@ jobs:
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer config -g repos.packagist composer https://mirrors.tencent.com/composer/
+          ./bny composer update --no-dev --classmap-authoritative
 
       - name: Compile webman project
         env:
