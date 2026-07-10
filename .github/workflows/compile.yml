@@ -101,7 +101,7 @@ jobs:
           make
           sudo ./v symlink
           sudo apt update
-          sudo apt install curl
+          sudo apt install -y curl ca-certificates openssl
 
       - name: Build bny
         run: v -os linux . -o bny
@@ -113,6 +113,12 @@ jobs:
         run: |
           ./bny add 8.2
           ./bny php -m
+          ./bny php -r "var_dump(curl_test());" 2>&1 || true
+
+      - name: Test network
+        run: |
+          curl -v https://repo.packagist.org/packages.json 2>&1 | head -30 || true
+          ./bny php -r "echo file_get_contents('https://repo.packagist.org/packages.json') ? 'PHP network OK' : 'PHP network FAIL';" 2>&1 || true
 
       - name: Add composer
         run: |
@@ -169,7 +175,7 @@ jobs:
           make
           sudo ./v symlink
           sudo apt update
-          sudo apt install curl
+          sudo apt install -y curl ca-certificates openssl
 
       - name: Build bny
         run: v -os linux . -o bny
@@ -182,6 +188,11 @@ jobs:
           ./bny add 8.2
           ./bny php -m
       
+      - name: Test network
+        run: |
+          curl -v https://repo.packagist.org/packages.json 2>&1 | head -30 || true
+          ./bny php -r "echo file_get_contents('https://repo.packagist.org/packages.json') ? 'PHP network OK' : 'PHP network FAIL';" 2>&1 || true
+
       - name: Add composer
         run: |
           ./bny composer
