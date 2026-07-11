@@ -12,31 +12,8 @@ pub fn macos_build(conf common.BnyConfig) ! {
 	p := os.execute('codesign --force --deep --sign - ${project}')
 	println(p.exit_code)
 	println(p.output)
-	if mac_noterm() {
-		dir := build_dmg()!
-		os.cp_all(project, dir, true)!
-		os.execute('hdiutil create -srcfolder ${dir} -volname "${conf.name}" -format UDZO ' +
-			common.shell_path(conf.name + '.dmg'))
-		os.execute('codesign --force --sign - ' + common.shell_path(conf.name + '.dmg'))
-	} else {
-		dir := build_pkg()!
-		os.cp_all(project, common.path_add(dir, 'Applications'), true)!
-		pkg_path := common.shell_path(conf.name + '.pkg')
-		pkg_tmp := pkg_path + '.tmp'
-		r1 := os.execute('pkgbuild --root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 ${pkg_tmp}')
-		println('pkgbuild exit: ${r1.exit_code}')
-		println(r1.output)
-		if r1.exit_code != 0 {
-			error('pkgbuild failed')
-		}
-		r2 := os.execute('productsign --sign - ${pkg_tmp} ${pkg_path}')
-		if r2.exit_code != 0 {
-			println(term.yellow('未签名,用户可自行签名'))
-			os.cp(pkg_tmp, pkg_path)!
-		}
-		os.rm(pkg_tmp)!
-	}
-	println(term.green('编译完成:' + common.shell_path(conf.name + '.(pkg/dmg)')))
+	os.cp_all(project, common.shell_path(conf.name + '.app'), true)!
+	println(term.green('编译完成:' + common.shell_path(conf.name + '.app')))
 }
 
 /**
@@ -147,41 +124,41 @@ fn build_cache_dir() !string {
 	return dir
 }
 
-/**
- * 创建dmg打包目录
- * @return 打包目录
- */
-fn build_dmg() !string {
-	dir := common.path_add(common.Dirs{}.cache, 'dmg_' + time.now().custom_format('YYMDHms'))
-	arr := [
-		dir,
-		common.path_add(dir, 'Applications'),
-	]
-	for i in arr {
-		if !os.is_dir(i) {
-			os.mkdir(i, os.MkdirParams{})!
-		}
-	}
-	return dir
-}
+// /**
+//  * 创建dmg打包目录
+//  * @return 打包目录
+//  */
+// fn build_dmg() !string {
+// 	dir := common.path_add(common.Dirs{}.cache, 'dmg_' + time.now().custom_format('YYMDHms'))
+// 	arr := [
+// 		dir,
+// 		common.path_add(dir, 'Applications'),
+// 	]
+// 	for i in arr {
+// 		if !os.is_dir(i) {
+// 			os.mkdir(i, os.MkdirParams{})!
+// 		}
+// 	}
+// 	return dir
+// }
 
-/**
- * 创建pkg打包目录
- * @return 打包目录
- */
-fn build_pkg() !string {
-	dir := common.path_add(common.Dirs{}.cache, 'pkg_' + time.now().custom_format('YYMDHms'))
-	arr := [
-		dir,
-		common.path_add(dir, 'Applications'),
-	]
-	for i in arr {
-		if !os.is_dir(i) {
-			os.mkdir(i, os.MkdirParams{})!
-		}
-	}
-	return dir
-}
+// /**
+//  * 创建pkg打包目录
+//  * @return 打包目录
+//  */
+// fn build_pkg() !string {
+// 	dir := common.path_add(common.Dirs{}.cache, 'pkg_' + time.now().custom_format('YYMDHms'))
+// 	arr := [
+// 		dir,
+// 		common.path_add(dir, 'Applications'),
+// 	]
+// 	for i in arr {
+// 		if !os.is_dir(i) {
+// 			os.mkdir(i, os.MkdirParams{})!
+// 		}
+// 	}
+// 	return dir
+// }
 
 /**
  * 是否命名窗口
