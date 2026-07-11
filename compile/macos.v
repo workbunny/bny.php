@@ -1,8 +1,6 @@
 module compile
 
 import common
-import time
-import os.cmdline
 import os
 import term
 
@@ -23,7 +21,7 @@ pub fn macos_build(conf common.BnyConfig) ! {
 		os.execute('pkgbuild -root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 --install-location ${dir}.pkg')
 		os.execute('productsign --sign - ${dir}.pkg '+ common.shell_path(conf.name, 'pkg'))
 	}
-	println(term.green('编译完成:${common.shell_path(conf.name + '.pkg/dmg')}')) */
+	println(term.green('编译完成:${common.shell_path(conf.name + '.pkg/dmg')}'))
 }
 
 /**
