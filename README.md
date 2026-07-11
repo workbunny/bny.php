@@ -129,7 +129,7 @@ bny clean
 
 - Windows 是采用 `EVB` 进行封包, `内存运行` ，安全指数：⭐⭐⭐⭐ 
 - Linux 是采用 `AppImage` 进行封包, `解压运行` ，安全指数：无 
-- MacOs 暂不支持封包
+- MacOs 仅封装为 `.app` 目录结构，`open/双击 运行`, 安全指数：无
 
 ### Linux compile 运行/打包要求
 
