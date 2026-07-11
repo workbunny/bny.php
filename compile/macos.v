@@ -23,8 +23,18 @@ pub fn macos_build(conf common.BnyConfig) ! {
 		os.cp_all(project, common.path_add(dir, 'Applications'), true)!
 		pkg_path := common.shell_path(conf.name + '.pkg')
 		pkg_tmp := pkg_path + '.tmp'
-		os.execute('pkgbuild --root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 ${pkg_tmp}')
-		os.execute('productsign --sign - ${pkg_tmp} ${pkg_path}')
+		r1 := os.execute('pkgbuild --root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 ${pkg_tmp}')
+		println('pkgbuild exit: ${r1.exit_code}')
+		println(r1.output)
+		if r1.exit_code != 0 {
+			error('pkgbuild failed')
+		}
+		r2 := os.execute('productsign --sign - ${pkg_tmp} ${pkg_path}')
+		println('productsign exit: ${r2.exit_code}')
+		println(r2.output)
+		if r2.exit_code != 0 {
+			error('productsign failed')
+		}
 		os.rm(pkg_tmp)!
 	}
 	println(term.green('编译完成:' + common.shell_path(conf.name + '.(pkg/dmg)')))
