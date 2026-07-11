@@ -83,8 +83,10 @@ fn build_cache_project(conf common.BnyConfig) !string {
 	os.cp_all(php_dir, common.path_add(dir, 'Contents', 'MacOS', 'php'), true)!
 
 	// 复制cli文件
-	os.cp(common.path_add(common.Dirs{}.script, 'cli'), common.path_add(dir, 'Contents',
-		'MacOS', 'cli'))!
+	cli_src := common.path_add(common.Dirs{}.script, 'cli')
+	cli_dst := common.path_add(dir, 'Contents', 'MacOS', 'cli')
+	println('cli源文件: ${cli_src} 存在: ${os.is_file(cli_src)}')
+	os.cp(cli_src, cli_dst)!
 
 	// 复制项目内容
 	arr := os.ls(common.shell_path(none))!
