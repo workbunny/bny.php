@@ -106,7 +106,7 @@ fn create_cache_project(conf common.BnyConfig) !string {
 
 	// 复制项目内容
 	arr := os.ls(common.shell_path(none))!
-	println(arr)
+	// println(arr)
 	for i in arr {
 		if common.filter_path(i,conf.ignore) {
 			continue

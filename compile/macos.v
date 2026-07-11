@@ -12,8 +12,18 @@ pub fn macos_build(conf common.BnyConfig) ! {
 	p := os.execute('codesign --force --deep --sign - ${project}')
 	println(p.exit_code)
 	println(p.output)
-	os.cp_all(project, common.shell_path(conf.name + '.app'), true)!
-	println(term.green('编译完成:${common.shell_path(conf.name + '.app')}'))
+	if mac_noterm() {
+		dir := build_dmg()!
+		os.cp_all(project,dir,true)!
+		os.execute('hdiutil create -srcfolder ${dir} -volname "${conf.name}" -format UDZO ${common.shell_path(conf.name, 'dmg')}')
+		os.execute('codesign --force --sign - ${common.shell_path(conf.name, 'dmg')}')
+	} else {
+		dir := build_pkg()!
+		os.cp_all(project, common.path_add(dir, 'Applications'), true)!
+		os.execute('pkgbuild -root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 --install-location ${dir}.pkg')
+		os.execute('productsign --sign - ${dir}.pkg '+ common.shell_path(conf.name, 'pkg'))
+	}
+	println(term.green('编译完成:${common.shell_path(conf.name + '.pkg/dmg')}')) */
 }
 
 /**
@@ -88,7 +98,7 @@ fn build_cache_project(conf common.BnyConfig) !string {
 
 	// 复制项目内容
 	arr := os.ls(common.shell_path(none))!
-	println(arr)
+	// println(arr)
 	for i in arr {
 		if common.filter_path(i, conf.ignore) {
 			continue
@@ -115,6 +125,42 @@ fn build_cache_dir() !string {
 		common.path_add(dir, 'Contents'),
 		common.path_add(dir, 'Contents', 'MacOS'),
 		common.path_add(dir, 'Contents', 'Resources'),
+	]
+	for i in arr {
+		if !os.is_dir(i) {
+			os.mkdir(i, os.MkdirParams{})!
+		}
+	}
+	return dir
+}
+
+/**
+ * 创建dmg打包目录
+ * @return 打包目录
+ */
+fn build_dmg() !string {
+	dir := common.path_add(common.Dirs{}.cache, 'dmg_' + time.now().custom_format('YYMDHms'))
+	arr := [
+		dir,
+		common.path_add(dir, 'Applications'),
+	]
+	for i in arr {
+		if !os.is_dir(i) {
+			os.mkdir(i, os.MkdirParams{})!
+		}
+	}
+	return dir
+}
+
+/**
+ * 创建pkg打包目录
+ * @return 打包目录
+ */
+fn build_pkg() !string {
+	dir := common.path_add(common.Dirs{}.cache, 'pkg_' + time.now().custom_format('YYMDHms'))
+	arr := [
+		dir,
+		common.path_add(dir, 'Applications'),
 	]
 	for i in arr {
 		if !os.is_dir(i) {
