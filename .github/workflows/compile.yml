@@ -257,6 +257,8 @@ jobs:
           cd test/cli/demo
           ../../../bny compile .
           ls -l index.app/Contents/MacOS/
+          index.app/Contents/MacOS/cli
+          open index.app
       
       # - name: Compile pebview project
       #   run: |
