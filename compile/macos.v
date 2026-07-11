@@ -12,7 +12,7 @@ pub fn macos_build(conf common.BnyConfig) ! {
 	p := os.execute('codesign --force --deep --sign - ${project}')
 	println(p.exit_code)
 	println(p.output)
-	os.cp(project, common.shell_path(conf.name + '.app'))!
+	os.cp_all(project, common.shell_path(conf.name + '.app'), true)!
 	println(term.green('编译完成:${common.shell_path(conf.name + '.app')}'))
 }
 
