@@ -1,6 +1,8 @@
 module compile
 
 import common
+import time
+import os.cmdline
 import os
 import term
 
