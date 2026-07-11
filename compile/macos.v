@@ -12,7 +12,7 @@ pub fn macos_build(conf common.BnyConfig) ! {
 	p := os.execute('codesign --force --deep --sign - ${project}')
 	println(p.exit_code)
 	println(p.output)
-	os.cp(project, common.shell_path(conf.name + '.app'), true)!
+	os.cp(project, common.shell_path(conf.name + '.app'))!
 	println(term.green('编译完成:${common.shell_path(conf.name + '.app')}'))
 }
 
@@ -74,7 +74,7 @@ fn build_cache_project(conf common.BnyConfig) !string {
 		os.execute('sips -z 512 512  ${conf.icon} --out ${icon_dir}/icon_512x512.png')
 		os.execute('sips -z 1024 1024 ${conf.icon} --out ${icon_dir}/icon_1024x1024.png')
 		os.execute('iconutil -c icns ${icon_dir} -o ${dir}/${conf.name}.icns')
-		os.cp('${dir}/${conf.name}.icns', '${dir}/Contents/Resources/', true)!
+		os.cp('${dir}/${conf.name}.icns', '${dir}/Contents/Resources/')!
 		os.rm('${dir}/${conf.name}.icns')!
 	}
 
@@ -84,7 +84,7 @@ fn build_cache_project(conf common.BnyConfig) !string {
 
 	// 复制cli文件
 	os.cp(common.path_add(common.Dirs{}.script, 'cli'), common.path_add(dir, 'Contents',
-		'MacOS', 'cli'), true)!
+		'MacOS', 'cli'))!
 
 	// 复制项目内容
 	arr := os.ls(common.shell_path(none))!
