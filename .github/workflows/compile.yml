@@ -15,6 +15,7 @@ on:
           - windows-x64
           - linux-x64
           - linux-arm64
+          - macos-arm64
 
 jobs:
 
@@ -215,6 +216,7 @@ jobs:
   build-macos-arm64:
     runs-on: macos-latest
     name: Build macOS arm64
+    if: ${{ github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos-arm64' || github.event_name == 'push' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
