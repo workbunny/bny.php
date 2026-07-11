@@ -16,15 +16,18 @@ pub fn macos_build(conf common.BnyConfig) ! {
 		dir := build_dmg()!
 		os.cp_all(project, dir, true)!
 		os.execute('hdiutil create -srcfolder ${dir} -volname "${conf.name}" -format UDZO ' +
-			common.shell_path(conf.name + 'dmg'))
+			common.shell_path(conf.name + '.dmg'))
 		os.execute('codesign --force --sign - ' + common.shell_path(conf.name + '.dmg'))
 	} else {
 		dir := build_pkg()!
 		os.cp_all(project, common.path_add(dir, 'Applications'), true)!
-		os.execute('pkgbuild -root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 --install-location ${common.shell_path(conf.name + '.pkg')}.pkg')
-		os.execute('productsign --sign - ${common.shell_path(conf.name + '.pkg')} ' + common.shell_path(conf.name + '.pkg'))
+		pkg_path := common.shell_path(conf.name + '.pkg')
+		pkg_tmp := pkg_path + '.tmp'
+		os.execute('pkgbuild --root ${dir} --identifier app.${conf.name}.bny --version 1.0.0 ${pkg_tmp}')
+		os.execute('productsign --sign - ${pkg_tmp} ${pkg_path}')
+		os.rm(pkg_tmp)!
 	}
-	println(term.green('编译完成:' + common.shell_path(conf.name + '.pkg/dmg')))
+	println(term.green('编译完成:' + common.shell_path(conf.name + '.(pkg/dmg)')))
 }
 
 /**
