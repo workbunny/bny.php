@@ -30,12 +30,12 @@ pub fn macos_build(conf common.BnyConfig) ! {
 			error('pkgbuild failed')
 		}
 		r2 := os.execute('productsign --sign - ${pkg_tmp} ${pkg_path}')
-		println('productsign exit: ${r2.exit_code}')
-		println(r2.output)
 		if r2.exit_code != 0 {
-			error('productsign failed')
+			println(term.yellow('productsign失败,使用未签名pkg'))
+			os.cp(pkg_tmp, pkg_path)!
+		} else {
+			os.rm(pkg_tmp)!
 		}
-		os.rm(pkg_tmp)!
 	}
 	println(term.green('编译完成:' + common.shell_path(conf.name + '.(pkg/dmg)')))
 }
