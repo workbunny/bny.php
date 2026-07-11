@@ -130,8 +130,8 @@ fn build_cache_dir() !string {
  */
 fn mac_noterm() bool {
 	mut args := common.get_args()
-	noterm := cmdline.option(args, '-noterm', 'no')
-	if noterm == 'no' {
+	n := cmdline.option(args, '-noterm', 'no')
+	if n == 'no' {
 		return false
 	} else {
 		return true

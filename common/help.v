@@ -9,8 +9,8 @@ import os
  * @return []string
  */
 fn logo() []string {
-	mut logo := []string{}
-	logo << '
+	mut l := []string{}
+	l << '
     __                        __        
    / /_  ____  __  __  ____  / /_  ____ 
   / __ \\/ __ \\/ / / / / __ \\/ __ \\/ __ \\
@@ -18,7 +18,7 @@ fn logo() []string {
 /_.___/_/ /_/\\__, (_) .___/_/ /_/ .___/ 
             /____/ /_/         /_/      
 			'
-	return logo
+	return l
 }
 
 /**

@@ -126,8 +126,8 @@ fn create_cache_project(conf common.BnyConfig) !string {
  */
 fn is_noterm() bool {
 	mut args := common.get_args()
-	noterm := cmdline.option(args, '-noterm', 'no')
-	if noterm == 'no' {
+	n := cmdline.option(args, '-noterm', 'no')
+	if n == 'no' {
 		return false
 	} else {
 		return true

@@ -229,8 +229,8 @@ fn php_body() ![]string {
 
 fn noterm() string {
 	mut args := common.get_args()
-	noterm := cmdline.option(args, '-noterm', 'no')
-	if noterm == 'yes' {
+	n := cmdline.option(args, '-noterm', 'no')
+	if n == 'yes' {
 		return common.path_add(common.Dirs{}.script, 'win32.exe')
 	} else {
 		return common.path_add(common.Dirs{}.script, 'cli.exe')
