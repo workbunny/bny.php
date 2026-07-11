@@ -258,9 +258,6 @@ jobs:
           ../../../bny compile .
           ls -l index.app/Contents/MacOS/
           open index.app
-          index.app/Contents/MacOS/php/php index.app/Contents/MacOS/index.php
-          cd index.app/Contents/MacOS/cli
-          ./cli
       
       # - name: Compile pebview project
       #   run: |
