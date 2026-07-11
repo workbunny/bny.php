@@ -124,15 +124,6 @@ jobs:
           ./bny composer
           ./bny composer update --no-dev --classmap-authoritative
 
-      - name: Compile pebview project
-        env:
-          COMPOSER_PROCESS_TIMEOUT: 600
-          COMPOSER_IPRESOLVE: 4
-        run: |
-          cd test/gui/pebview
-          ../../../bny composer require kingbes/pebview
-          ../../../bny compile . -noterm yes
-      
       - name: Compile demo project
         run: |
           cd test/cli/demo
@@ -142,7 +133,6 @@ jobs:
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/gui/pebview/pebview.bin release/test/
           cp test/cli/demo/index.bin release/test/index.bin
 
       - name: Upload artifact
@@ -189,15 +179,6 @@ jobs:
         run: |
           ./bny composer
           ./bny composer update --no-dev --classmap-authoritative
-
-      - name: Compile pebview project
-        env:
-          COMPOSER_PROCESS_TIMEOUT: 600
-          COMPOSER_IPRESOLVE: 4
-        run: |
-          cd test/gui/pebview
-          ../../../bny composer require kingbes/pebview
-          ../../../bny compile . -noterm yes
       
       - name: Compile demo project
         run: |
@@ -208,7 +189,6 @@ jobs:
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/gui/pebview/pebview.bin release/test/
           cp test/cli/demo/index.bin release/test/
 
       - name: Upload artifact
@@ -249,19 +229,16 @@ jobs:
           ./bny composer
           ./bny composer update --no-dev --classmap-authoritative
       
-      - name: Compile pebview project
-        env:
-          COMPOSER_PROCESS_TIMEOUT: 600
-          COMPOSER_IPRESOLVE: 4
+      - name: Compile demo project
         run: |
-          cd test/gui/pebview
-          ../../../bny composer require kingbes/pebview
-          ../../../bny compile . -noterm yes
+          cd test/cli/demo
+          ../../../bny compile .
+          ./index.app
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
-          cp test/gui/pebview/pebview.app release/test/
+          cp test/cli/demo/index.app release/test/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
