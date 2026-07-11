@@ -24,6 +24,30 @@ pub fn macos_build(conf common.BnyConfig) ! {
 fn build_cache_project(conf common.BnyConfig) !string {
 	info := common.get_info()!
 	dir := build_cache_dir()!
+
+	// 创建执行文件
+	mut sh_file := []string{}
+	sh_file << '#!/bin/zsh'
+	if mac_noterm() {
+		sh_file << 'SCRIPT_ABS_PATH=$(cd "$(dirname "$0")" && pwd)'
+		sh_file << 'cd \$SCRIPT_ABS_PATH'
+		sh_file << '"./cli" $@'
+	} else {
+		sh_file << 'if [ ! -t 0 ]; then'
+		sh_file << '	self="$(cd "$(dirname "\$0")" && pwd)/\${0:t}"'
+		sh_file << '	osascript -e "tell app \"Terminal\" to do script \"\${(q)self} \${(q)@}\""'
+		sh_file << '	osascript -e "tell app \"Terminal\" to activate"'
+		sh_file << '	exit 0'
+		sh_file << 'fi'
+		sh_file << 'cli="$(cd "$(dirname "\$0")" && pwd)/cli"'
+		sh_file << '[ ! -f "\$cli" ] && { echo "错误：找不到 \$cli"; exit 1; }'
+		sh_file << '"\$cli" "$@"'
+		sh_file << 'code=$?'
+		sh_file << 'echo -e "\n执行完毕(退出码 \$code)，按回车关闭窗口..."'
+		sh_file << 'read'
+		sh_file << 'exit \$code'
+	}
+	os.write_file(common.path_add(dir, 'Contents', 'MacOS', 'sh'), sh_file.join('\n'))!
 	// 创建配置文件
 	mut info_plist := []string{}
 	info_plist << '<?xml version="1.0" encoding="UTF-8"?>'
@@ -34,7 +58,7 @@ fn build_cache_project(conf common.BnyConfig) !string {
 	info_plist << '     <string>APPL</string>'
 
 	info_plist << '     <key>CFBundleExecutable</key>'
-	info_plist << '     <string>cli</string>'
+	info_plist << '     <string>sh</string>'
 
 	info_plist << '     <key>CFBundleIdentifier</key>'
 	info_plist << '     <string>app.${info.name}.bny</string>'
