@@ -161,6 +161,10 @@ jobs:
 
       - name: Build bny
         run: v -os macos . -o bny
+      
+      - name: Build cli
+        run: |
+          v -os macos script/cli.v -o script/cli
 
       - name: Prepare release package
         run: |
@@ -168,6 +172,7 @@ jobs:
           cp bny release/bny/
           cp icon.png release/bny/ || true
           cp README.md release/bny/
+          cp script/cli release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

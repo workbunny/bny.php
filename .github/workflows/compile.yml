@@ -70,7 +70,7 @@ jobs:
         run: |
           cd test/gui/pebview
           ../../../bny.exe php -d extension=ffi -d ffi.enable=true -d extension=openssl ../../../composer.phar require kingbes/pebview
-          ../../../bny.exe compile . -noterm true
+          ../../../bny.exe compile . -noterm yes
 
       - name: Prepare release package
         run: |
@@ -131,7 +131,7 @@ jobs:
         run: |
           cd test/gui/pebview
           ../../../bny composer require kingbes/pebview
-          ../../../bny compile . -noterm true
+          ../../../bny compile . -noterm yes
       
       - name: Compile demo project
         run: |
@@ -197,7 +197,7 @@ jobs:
         run: |
           cd test/gui/pebview
           ../../../bny composer require kingbes/pebview
-          ../../../bny compile . -noterm true
+          ../../../bny compile . -noterm yes
       
       - name: Compile demo project
         run: |
@@ -215,5 +215,57 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-linux-aarch64
+          path: release
+          if-no-files-found: error
+
+  build-macos-arm64:
+    runs-on: macos-latest
+    name: Build macOS arm64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install V
+        run: |
+          git clone --depth=1 https://github.com/vlang/v
+          cd v
+          make
+          sudo ./v symlink
+
+      - name: Build bny
+        run: v -os macos . -o bny
+      
+      - name: Build cli
+        run: |
+          v -os macos script/cli.v -o script/cli
+      
+      - name: Add PHP 8.2
+        run: |
+          ./bny add 8.2
+          ./bny php -m
+      
+      - name: Add composer
+        run: |
+          ./bny composer
+          ./bny composer update --no-dev --classmap-authoritative
+      
+      - name: Compile pebview project
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 600
+          COMPOSER_IPRESOLVE: 4
+        run: |
+          cd test/gui/pebview
+          ../../../bny composer require kingbes/pebview
+          ../../../bny compile . -noterm yes
+
+      - name: Prepare release package
+        run: |
+          mkdir -p release/test
+          cp test/gui/pebview/pebview.app release/test/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-macos-arm64
           path: release
           if-no-files-found: error

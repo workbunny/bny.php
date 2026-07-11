@@ -19,6 +19,9 @@ pub fn run() ! {
 			'linux' {
 				linux_build(conf)!
 			}
+			'macos' {
+				macos_build(conf)!
+			}
 			else {
 				println(term.red('暂不支持的操作系统'))
 			}
