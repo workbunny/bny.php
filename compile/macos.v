@@ -29,7 +29,7 @@ fn build_cache_project(conf common.BnyConfig) !string {
 	mut sh_file := []string{}
 	sh_file << '#!/bin/zsh'
 	if mac_noterm() {
-		sh_file << 'SCRIPT_ABS_PATH=$(cd "$(dirname "$0")" && pwd)'
+		sh_file << 'SCRIPT_ABS_PATH=$(cd "$(dirname "\$0")" && pwd)'
 		sh_file << 'cd \$SCRIPT_ABS_PATH'
 		sh_file << '"./cli" $@'
 	} else {
