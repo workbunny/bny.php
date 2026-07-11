@@ -168,7 +168,7 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p release/bny
+          mkdir -p release/bny/script
           cp bny release/bny/
           cp icon.png release/bny/ || true
           cp README.md release/bny/

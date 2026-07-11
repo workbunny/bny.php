@@ -104,6 +104,20 @@ fn to_dir(item common.PhpList) ! {
 		mut php_ini := os.read_file(common.app_path('/php/${item.name}/php.ini'))!
 		php_ini = php_ini.replace(';extension_dir = "ext"', 'extension_dir = "ext"')
 		os.write_file(common.app_path('/php/${item.name}/php.ini'), php_ini)!
+	} else {
+		// Linux/macOS: 创建php.ini并配置SSL证书路径
+		mut php_ini_content := '[PHP]\n'
+		php_ini_content += 'openssl.cafile=/etc/ssl/certs/ca-certificates.crt\n'
+		os.write_file(common.app_path('/php/${item.name}/php.ini'), php_ini_content)!
+		// 下载CA证书(如果不存在)
+		ca_cert_path := '/etc/ssl/certs/ca-certificates.crt'
+		if !os.is_file(ca_cert_path) {
+			println(term.dim('正在下载CA证书...'))
+			os.mkdir('/etc/ssl/certs', os.MkdirParams{}) or {}
+			http.download_file('https://download.workerman.net/php/ca-certificates.crt', ca_cert_path) or {
+				println(term.yellow('CA证书下载失败,HTTPS可能无法工作'))
+			}
+		}
 	}
 	println(term.green('添加成功!'))
 }
