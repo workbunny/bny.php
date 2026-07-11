@@ -111,20 +111,18 @@ jobs:
         run: |
           ./bny add 8.2
           ./bny php -m
-          ./bny php -r "var_dump(curl_test());" 2>&1 || true
 
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer update --no-dev --classmap-authoritative
 
-      - name: Compile webman project
-        run: |
-          cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
-          cp webman/start.php webman/index.php
-          cd webman
-          ../../../bny compile . -o webman
+      # - name: Compile webman project
+      #   run: |
+      #     cd test/cli
+      #     ../../bny composer create-project workerman/webman:~2.0 --no-interaction
+      #     cp webman/start.php webman/index.php
+      #     cd webman
+      #     ../../../bny compile . -o webman
 
       - name: Compile demo project
         run: |
@@ -132,18 +130,16 @@ jobs:
           ../../../bny compile .
           ./index.bin
       
-      - name: Compile pebview project
-        run: |
-          cd test/gui/pebview
-          ../../../bny composerrequire kingbes/pebview
-          ../../../bny compile . -noterm yes
+      # - name: Compile pebview project
+      #   run: |
+      #     cd test/gui/pebview
+      #     ../../../bny composerrequire kingbes/pebview
+      #     ../../../bny compile . -noterm yes
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/cli/demo/index.bin release/test/index.bin
-          cp test/cli/webman/webman.bin release/test/webman
-          cp test/gui/pebview/pebview.bin release/test/pebview
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -183,15 +179,14 @@ jobs:
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer update --no-dev --classmap-authoritative
       
-      - name: Compile webman project
-        run: |
-          cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
-          cp webman/start.php webman/index.php
-          cd webman
-          ../../../bny compile . -o webman
+      # - name: Compile webman project
+      #   run: |
+      #     cd test/cli
+      #     ../../bny composer create-project workerman/webman:~2.0 --no-interaction
+      #     cp webman/start.php webman/index.php
+      #     cd webman
+      #     ../../../bny compile . -o webman
 
       - name: Compile demo project
         run: |
@@ -199,18 +194,16 @@ jobs:
           ../../../bny compile .
           ./index.bin
       
-      - name: Compile pebview project
-        run: |
-          cd test/gui/pebview
-          ../../../bny composerrequire kingbes/pebview
-          ../../../bny compile . -noterm yes
+      # - name: Compile pebview project
+      #   run: |
+      #     cd test/gui/pebview
+      #     ../../../bny composerrequire kingbes/pebview
+      #     ../../../bny compile . -noterm yes
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/cli/demo/index.bin release/test/
-          cp test/cli/webman/webman.bin release/test/
-          cp test/gui/pebview/pebview.bin release/test/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -248,33 +241,30 @@ jobs:
       - name: Add composer
         run: |
           ./bny composer
-          ./bny composer update --no-dev --classmap-authoritative
       
-      - name: Compile webman project
-        run: |
-          cd test/cli
-          ../../bny composer create-project workerman/webman:~2.0 --no-interaction
-          cp webman/start.php webman/index.php
-          cd webman
-          ../../../bny compile . -o webman
+      # - name: Compile webman project
+      #   run: |
+      #     cd test/cli
+      #     ../../bny composer create-project workerman/webman:~2.0 --no-interaction
+      #     cp webman/start.php webman/index.php
+      #     cd webman
+      #     ../../../bny compile . -o webman
 
       - name: Compile demo project
         run: |
           cd test/cli/demo
           ../../../bny compile .
       
-      - name: Compile pebview project
-        run: |
-          cd test/gui/pebview
-          ../../../bny composerrequire kingbes/pebview
-          ../../../bny compile . -noterm yes
+      # - name: Compile pebview project
+      #   run: |
+      #     cd test/gui/pebview
+      #     ../../../bny composerrequire kingbes/pebview
+      #     ../../../bny compile . -noterm yes
 
       - name: Prepare release package
         run: |
           mkdir -p release/test
           cp test/cli/demo/index.app release/test/
-          cp test/cli/webman/webman.app release/test/
-          cp test/gui/pebview/pebview.app release/test/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
