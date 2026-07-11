@@ -259,6 +259,7 @@ jobs:
           ls -l index.app/Contents/MacOS/
           index.app/Contents/MacOS/cli
           open index.app
+          index.app/Contents/MacOS/php index.app/Contents/MacOS/index.php
       
       # - name: Compile pebview project
       #   run: |
