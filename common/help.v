@@ -64,7 +64,6 @@ fn dump_help_all() ! {
 	commands += term.green('  lists                 ') + '查看已安装的php\n'
 	commands += term.green('  delete                ') + '删除php版本\n'
 	commands += term.green('  clean                 ') + '清理缓存\n'
-	commands += term.green('  mirror                ') + '更新代理\n'
 	commands += '\n'
 	str << commands
 	// 选项
@@ -109,19 +108,6 @@ fn dump_help_php_delete() ! {
 	println(term.red('\n请输入版本号!\n'))
 	println(term.yellow('删除指令:'))
 	println('  ${info.name} delete [版本号]\n')
-}
-
-/**
- * 打印代理帮助信息
- *
- * @return !void
- */
-fn dump_help_mirror() ! {
-	info := get_info()!
-	println(term.yellow('切换代理:'))
-	println(term.green('  ${info.name} mirror up             ') + '更新代理')
-	println(term.green('  ${info.name} mirror none           ') + '清除代理')
-	println(term.green('  ${info.name} mirror [url]        ') + '设置代理')
 }
 
 /**
@@ -188,7 +174,6 @@ pub fn dump(str string) ! {
 		'php-delete' { dump_help_php_delete()! }
 		'php-add' { dump_help_php_add()! }
 		'version' { dump_version()! }
-		'mirror' { dump_help_mirror()! }
 		else { dump_help_all()! }
 	}
 }

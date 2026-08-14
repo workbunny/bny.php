@@ -9,33 +9,12 @@ pub:
 	name string
 }
 
-pub struct Url {
-pub mut:
-	url  string
-	name string
-}
-
-pub struct Arch {
-pub:
-	x86_64  []Url
-	aarch64 []Url
-}
-
-pub struct Os {
-pub:
-	windows []Url
-	linux   Arch
-	macos   []Url
-}
-
 pub struct Info {
 pub mut:
 	name     string = 'bny'
-	version  string = 'v0.1.0'
-	mirror   string
+	version  string = 'v0.1.1'
 	php      int = -1
 	php_list []PhpList
-	url      Os
 }
 
 /**
@@ -44,76 +23,7 @@ pub mut:
  * @return 应用程序信息
  */
 pub fn get_info() !Info {
-	mut info := Info{
-		url: Os{
-			windows: [
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.5.6-nts-Win32-vs17-x64.zip'
-					name: '8.5'
-				},
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.4.21-nts-Win32-vs17-x64.zip'
-					name: '8.4'
-				},
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.3.31-nts-Win32-vs16-x64.zip'
-					name: '8.3'
-				},
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.2.31-nts-Win32-vs16-x64.zip'
-					name: '8.2'
-				},
-			]
-			linux:   Arch{
-				x86_64:  [
-					Url{
-						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.4-linux-x86_64-glibc.zip'
-						name: '8.4'
-					},
-					Url{
-						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.3-linux-x86_64-glibc.zip'
-						name: '8.3'
-					},
-					Url{
-						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.2-linux-x86_64-glibc.zip'
-						name: '8.2'
-					},
-				]
-				aarch64: [
-					Url{
-						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.4-linux-aarch64-glibc.zip'
-						name: '8.4'
-					},
-					Url{
-						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.3-linux-aarch64-glibc.zip'
-						name: '8.3'
-					},
-					Url{
-						url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-cli-8.2-linux-aarch64-glibc.zip'
-						name: '8.2'
-					},
-				]
-			}
-			macos:   [
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.4-macos-aarch64.zip'
-					name: '8.4'
-				},
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.3-macos-aarch64.zip'
-					name: '8.3'
-				},
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.2-macos-aarch64.zip'
-					name: '8.2'
-				},
-				Url{
-					url:  'https://github.com/KingBes/static-php-cli/releases/download/download/php-8.1-macos-aarch64.zip'
-					name: '8.1'
-				},
-			]
-		}
-	}
+	mut info := Info{}
 	path := app_path('/info.json')
 	if os.is_file(path) {
 		mut file := os.read_file(path)!

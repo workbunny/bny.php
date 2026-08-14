@@ -6,7 +6,6 @@ import worker
 import php
 import composer
 import compile
-import mirror
 
 fn init() {
 	php_dir := common.app_path('/php')
@@ -41,7 +40,6 @@ fn main() {
 			'lists' { php.lists_run()! }
 			'delete' { php.delete_run()! }
 			'clean' { clean()! }
-			'mirror' { mirror.run()! }
 			'-v' { common.dump('version')! }
 			'-h' { common.dump('help')! }
 			else { common.dump('help')! }

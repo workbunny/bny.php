@@ -6,15 +6,12 @@ import term
 pub fn search_run() ! {
 	i := common.get_info()!
 	println(term.yellow('\n搜索结果:\n'))
-	println(term.green('  版本号      链接\n'))
-	data := get_download_list()!
-	for item in data {
-		mut sele := ' '
-		if i.php >= 0 && i.php_list[i.php].name == item.name {
-			sele = term.red('※')
-		}
-		println('${sele} ${item.name}       ${item.url}')
+	println(term.green('  版本号      字节\n'))
+	mut cur := ''
+	if i.php >= 0 && i.php < i.php_list.len {
+		cur = i.php_list[i.php].name
 	}
+	common.php_search(cur)!
 	println('\n')
 	println(term.yellow('安装指令:\n'))
 	println('  ${i.name} add [版本号]\n')

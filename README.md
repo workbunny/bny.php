@@ -138,38 +138,6 @@ apt install -y file
 export APPIMAGE_EXTRACT_AND_RUN=1
 ```
 
-## 下载源配置
-
-在 `info.json` 中可以手动配置 PHP 下载源：
-
-```json
-{
-    "php": 1, // 已经启动的php版本 从0开始选择php_list序列
-    "php_list": [ // 已经安装的php版本，可手动添加和修改
-        {
-            "path": "...",
-            "name": "8.4"
-        },
-        {
-            "path": "...",
-            "name": "8.3"
-        }
-    ],
-    "url": { // 默认下载源，可手动添加和修改
-        "windows": [
-            {"name": "8.5", "url": "https://..."}
-        ],
-        "linux": { // linux 和 macos 最好采用 static-php-cli 
-            "x86_64": [
-                {"name": "8.4", "url": "https://..."}
-            ],
-            "aarch64": []
-        },
-        "macos": []
-    }
-}
-```
-
 ## 许可证
 
 MIT License

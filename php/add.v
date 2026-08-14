@@ -41,25 +41,17 @@ pub fn add_run() ! {
 fn download(name string) !common.PhpList {
 	// 文件夹路径
 	dir_path := common.app_path('/php')
-	mut sele_url := common.Url{}
-	for i in get_download_list()! {
-		if i.name == name {
-			sele_url = i
-		}
-	}
-	if sele_url.url == '' {
-		println(term.red('未找到php版本!'))
-		exit(1)
-	}
+	// 确保下载目录存在
+	os.mkdir_all(dir_path)!
+	url := common.get_clinet_url(name)!
 	println(term.dim('正在下载,请耐心等待...'))
-	info := common.get_info()!
-	res := http.download_file_with_progress(info.mirror + sele_url.url, common.path_add(dir_path, '${name}.zip'),
+	res := http.download_file_with_progress(url, common.path_add(dir_path,'${name}.zip'),
 		http.DownloaderParams{
 		FetchConfig: http.FetchConfig{
 			allow_redirect: true
 		}
 	}) or {
-		println(term.red('下载文件失败,未知错误~'))
+		println(term.red('下载文件失败: ${err}'))
 		exit(1)
 	}
 	if res.status_code == 200 {
