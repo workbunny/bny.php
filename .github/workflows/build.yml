@@ -14,6 +14,14 @@ on:
           - linux-x64
           - linux-arm64
           - macos-arm64
+      r2_access_key_id:
+        description: 'R2 访问密钥 ID (Access Key ID)'
+        required: true
+        type: string
+      r2_secret_access_key:
+        description: 'R2 私密访问密钥 (Secret Access Key)'
+        required: true
+        type: string
 
 jobs:
 
@@ -21,8 +29,8 @@ jobs:
     runs-on: windows-latest
     name: Build Windows x86_64
     env:
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+      R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,8 +50,8 @@ jobs:
       - name: Inject R2 credentials
         shell: pwsh
         env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+          R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
         run: |
           $p = 'common/client.v'
           $c = [System.IO.File]::ReadAllText($p)
@@ -86,8 +94,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Linux x86_64
     env:
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+      R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -101,8 +109,8 @@ jobs:
 
       - name: Inject R2 credentials
         env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+          R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
         run: |
           sed -i "s/__R2_ACCESS_KEY_ID__/$R2_ACCESS_KEY_ID/g; s/__R2_SECRET_ACCESS_KEY__/$R2_SECRET_ACCESS_KEY/g" common/client.v
 
@@ -134,8 +142,8 @@ jobs:
     runs-on: Ubuntu-24.04-arm
     name: Build Linux aarch64
     env:
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+      R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -149,8 +157,8 @@ jobs:
 
       - name: Inject R2 credentials
         env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+          R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
         run: |
           sed -i "s/__R2_ACCESS_KEY_ID__/$R2_ACCESS_KEY_ID/g; s/__R2_SECRET_ACCESS_KEY__/$R2_SECRET_ACCESS_KEY/g" common/client.v
 
@@ -182,8 +190,8 @@ jobs:
     runs-on: macos-latest
     name: Build macOS arm64
     env:
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+      R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -197,8 +205,8 @@ jobs:
 
       - name: Inject R2 credentials
         env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCESS_KEY_ID: ${{ github.event.inputs.r2_access_key_id }}
+          R2_SECRET_ACCESS_KEY: ${{ github.event.inputs.r2_secret_access_key }}
         run: |
           sed -i '' "s/__R2_ACCESS_KEY_ID__/$R2_ACCESS_KEY_ID/g; s/__R2_SECRET_ACCESS_KEY__/$R2_SECRET_ACCESS_KEY/g" common/client.v
 
