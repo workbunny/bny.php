@@ -269,7 +269,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          sed -i "s/__R2_ACCESS_KEY_ID__/$R2_ACCESS_KEY_ID/g; s/__R2_SECRET_ACCESS_KEY__/$R2_SECRET_ACCESS_KEY/g" common/client.v
+          sed -i '' "s/__R2_ACCESS_KEY_ID__/$R2_ACCESS_KEY_ID/g; s/__R2_SECRET_ACCESS_KEY__/$R2_SECRET_ACCESS_KEY/g" common/client.v
 
       - name: Build bny
         run: v -os macos . -o bny
