@@ -34,18 +34,8 @@ fn checked() ! {
 	comp := common.Composer{}
 	if !os.is_file(comp.path) {
 		println(term.dim('下载composer...'))
-		res := http.download_file_with_progress(comp.url, comp.path, http.DownloaderParams{
-			FetchConfig: http.FetchConfig{
-				allow_redirect: true
-			}
-		}) or {
+		http.download_file(comp.url, comp.path) or {
 			println(term.red('下载文件失败,未知错误~'))
-			exit(1)
-		}
-		if res.status_code == 200 {
-			println(term.green('下载完成!'))
-		} else {
-			println(term.red('下载文件失败,请检查网络连接'))
 			exit(1)
 		}
 	}
