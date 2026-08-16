@@ -33,3 +33,6 @@ info.json
 
 *.phar
 cache/
+
+*.def
+.trae

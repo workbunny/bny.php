@@ -84,7 +84,7 @@ fn get_os_with() !string
 }
 
 // 获取php版本号
-fn get_version_regex(path string) string 
+fn get_version_regex(path string) string
 {
     // 匹配 php- 后的版本号：至少两段数字，支持多段修订号
     mut re := regex.regex_opt(r'php-(\d+\.\d+(?:\.\d+)*)') or { return '' }
@@ -98,4 +98,62 @@ fn get_version_regex(path string) string
         return path[gs..ge]
     }
     return ''
+}
+
+// 获取 android php 运行时下载链接
+// 列出 php/android/ 前缀对象, 按 termux-php-<版本>-<架构>.zip 匹配指定架构, 多版本取最高
+pub fn get_android_url(arch string) !string {
+	list := client.list(s3.ListOptions{
+		max_keys: 100
+	})!
+	// 匹配 termux-php-<版本>-<架构>.zip 的正则 (raw 字符串不支持插值, 用拼接)
+	pattern := r'termux-php-(\d+\.\d+(?:\.\d+)*)-' + arch + r'\.zip$'
+	mut re := regex.regex_opt(pattern) or { return error('正则编译失败') }
+	mut find_key := ''
+	mut find_version := ''
+	for obj in list.objects {
+		key := obj.key
+		// 只要 php/android/ 前缀的对象
+		if !key.starts_with('php/android/') {
+			continue
+		}
+		start, _ := re.find(key)
+		if start == -1 {
+			continue
+		}
+		// 注意: V 的 regex 分组编号从 0 开始(0 = 第一个捕获组)
+		gs, ge := re.get_group_bounds_by_id(0)
+		if gs < 0 || ge <= gs {
+			continue
+		}
+		version := key[gs..ge]
+		// 多版本取最高
+		if find_version == '' || compare_version(version, find_version) > 0 {
+			find_version = version
+			find_key = key
+		}
+	}
+	if find_key == '' {
+		return error('未找到android php运行时: ${arch}')
+	}
+	url := client.presign(find_key, expires_in: 360)!
+	return url
+}
+
+// 比较版本号 按 . 拆成数字逐段比较
+// 返回 1 表示 a>b, -1 表示 a<b, 0 表示相等 (如 8.5.1 > 8.5 > 8.4.9)
+fn compare_version(a string, b string) int {
+	arr_a := a.split('.')
+	arr_b := b.split('.')
+	length := if arr_a.len > arr_b.len { arr_a.len } else { arr_b.len }
+	for i in 0 .. length {
+		na := if i < arr_a.len { arr_a[i].int() } else { 0 }
+		nb := if i < arr_b.len { arr_b[i].int() } else { 0 }
+		if na > nb {
+			return 1
+		} else if na < nb {
+			return -1
+		}
+	}
+	return 0
 }

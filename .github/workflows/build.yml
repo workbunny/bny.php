@@ -82,6 +82,7 @@ jobs:
           Copy-Item script/rcedit-x64.exe release/bny/script/
           Copy-Item script/cli.exe release/bny/script/
           Copy-Item script/win32.exe release/bny/script/
+          Copy-Item script/android release/bny/script/ -Recurse -ErrorAction SilentlyContinue
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -130,6 +131,7 @@ jobs:
           cp script/appimagetool-x86_64.AppImage release/bny/script/
           cp script/runtime-x86_64 release/bny/script/
           cp script/cli release/bny/script/
+          cp -r script/android release/bny/script/android
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -178,6 +180,7 @@ jobs:
           cp script/appimagetool-aarch64.AppImage release/bny/script/
           cp script/runtime-aarch64 release/bny/script/
           cp script/cli release/bny/script/
+          cp -r script/android release/bny/script/android
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -224,6 +227,7 @@ jobs:
           cp icon.png release/bny/ || true
           cp README.md release/bny/
           cp script/cli release/bny/script/
+          cp -r script/android release/bny/script/android
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

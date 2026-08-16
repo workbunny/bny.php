@@ -59,6 +59,7 @@ fn dump_help_all() ! {
 	commands += term.green('  php                   ') + '运行PHP\n'
 	commands += term.green('  composer              ') + '运行Composer\n'
 	commands += term.green('  compile               ') + '编译项目\n'
+	commands += term.green('  android               ') + '打包为Android APK\n'
 	commands += term.green('  add                   ') + '添加/选择php版本\n'
 	commands += term.green('  search                ') + '搜索php版本\n'
 	commands += term.green('  lists                 ') + '查看已安装的php\n'
@@ -161,6 +162,45 @@ fn dump_help_compile() ! {
 }
 
 /**
+ * 打印android打包帮助信息
+ *
+ * @return !void
+ */
+fn dump_help_android() ! {
+	info := get_info()!
+	mut arr := []string{}
+	arr << term.yellow('用法:')
+	arr << ''
+	arr << term.green('${info.name} android ') + term.yellow('[目标] <指令>')
+	arr << ''
+	arr << term.yellow('目标:')
+	arr << ''
+	arr << term.green('  .                          ') + '打包当前目录(读取bny.json)'
+	arr << ''
+	arr << term.yellow('指令:')
+	arr << ''
+	arr << term.green('  -h                          ') + '帮助查看'
+	arr << term.green('  -arch [aarch64/x86_64/all]  ') + '指定架构,默认all'
+	arr << term.green('  -release                    ') + '打release包(未签名),默认debug'
+	arr << term.green('  -ver [x.y]                  ') + '版本名,默认1.0'
+	arr << term.green('  -code [n]                   ') + '版本号,默认1'
+	arr << term.green('  -o [name]                   ') + '应用名称'
+	arr << term.green('  -icon [file]                ') + '应用图标(PNG)'
+	arr << ''
+	arr << term.yellow('环境要求:')
+	arr << ''
+	arr << term.blue('  JAVA_HOME                 ') + 'JDK 17+'
+	arr << term.blue('  ANDROID_HOME              ') + 'Android SDK (platform 34 + build-tools 34)'
+	arr << ''
+	arr << term.yellow('示例:')
+	arr << ''
+	arr << '${info.name} android .'
+	arr << '${info.name} android . -arch aarch64'
+	arr << '${info.name} android . -o myapp -icon icon.png -ver 2.0 -code 20'
+	println(arr.join('\n'))
+}
+
+/**
  * 打印信息
  *
  * @param str string 参数
@@ -169,6 +209,7 @@ fn dump_help_compile() ! {
 pub fn dump(str string) ! {
 	match str {
 		'compile' { dump_help_compile()! }
+		'android' { dump_help_android()! }
 		'run' { dump_help_run()! }
 		'php-run' { dump_help_php_run()! }
 		'php-delete' { dump_help_php_delete()! }

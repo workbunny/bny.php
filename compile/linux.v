@@ -71,7 +71,7 @@ fn create_cache_project(conf common.BnyConfig) !string {
 	// 创建cache配置文件
 	mut desktop_file := []string{}
 	desktop_file << '[Desktop Entry]' // 桌面开始
-	desktop_file << 'Name=${conf.name}' // 名称
+	desktop_file << 'Name=${conf.get_title()}' // 名称(默认按 name)
 	desktop_file << 'Type=Application' // 应用
 	desktop_file << 'Exec=AppRun' // 执行文件
 	desktop_file << 'Icon=icon' // 图标文件

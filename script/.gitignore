@@ -1,3 +1,5 @@
 cli.exe
 win32.exe
 cli
+gradle/
+gradle-8.9-bin.zip

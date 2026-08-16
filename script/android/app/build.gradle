@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.bny.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.bny.app"
+        minSdk 24
+        targetSdk 34
+        versionCode project.hasProperty('versionCode') ? (project.versionCode as int) : 1
+        versionName project.hasProperty('versionName') ? project.versionName : "1.0"
+    }
+
+    signingConfigs {
+        // 通过 -PstoreFile/-PstorePassword/-PkeyAlias/-PkeyPassword 注入签名信息
+        release {
+            if (project.hasProperty('storeFile')) {
+                storeFile file(project.storeFile)
+                storePassword project.storePassword
+                keyAlias project.keyAlias
+                keyPassword project.keyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (project.hasProperty('storeFile')) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        jniLibs {
+            // Keep native libs extracted as real files so the PHP binary can be executed
+            useLegacyPackaging = true
+        }
+    }
+
+    androidResources {
+        // payload 资源不压缩：用安装体积换启动时零解压、直接流式拷贝
+        noCompress '.php', '.html', '.json', '.lock', '.md', '.txt', '.xml',
+                  '.ico', '.pem', '.cnf', '.conf', '.hhi', 'hosts', 'payload_manifest'
+    }
+}
+
+dependencies {
+}

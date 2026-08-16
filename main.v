@@ -1,6 +1,7 @@
 module main
 
 import os
+import android
 import common
 import worker
 import php
@@ -35,6 +36,7 @@ fn main() {
 			'php' { php.run()! }
 			'composer' { composer.run()! }
 			'compile' { compile.run()! }
+			'android' { android.run()! }
 			'add' { php.add_run()! }
 			'search' { php.search_run()! }
 			'lists' { php.lists_run()! }
