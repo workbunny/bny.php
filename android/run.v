@@ -148,7 +148,6 @@ fn find_gradle() !string {
 
 /**
  * 自动准备 gradle 并解压到 script/gradle
- * zip 来源优先级: script 内置 (ci 打包时一并放入, 免下载) > cache 缓存 > 在线下载
  *
  * @param bin gradle 可执行文件期望路径
  * @return gradle 可执行文件路径
@@ -159,35 +158,26 @@ fn download_gradle(bin string) !string {
 		return bin
 	}
 	zip_name := 'gradle-8.9-bin.zip'
-	bundled_zip := common.path_add(common.Dirs{}.script, zip_name)
-	cache_zip := common.path_add(common.Dirs{}.cache, zip_name)
-	mut zip_path := ''
-	if os.is_file(bundled_zip) {
-		// script 内置 zip (发布包自带, 免下载)
-		println(term.dim('gradle: 使用内置 ${bundled_zip}'))
-		zip_path = bundled_zip
-	} else {
-		os.mkdir_all(common.Dirs{}.cache)!
-		if os.is_file(cache_zip) {
-			println(term.dim('gradle: 复用缓存 ${cache_zip}'))
-			zip_path = cache_zip
-		} else {
-			println(term.dim('gradle: 未找到, 开始自动下载准备 (仅首次)...'))
-			url := 'https://services.gradle.org/distributions/${zip_name}'
-			res := http.download_file_with_progress(url, cache_zip, http.DownloaderParams{
-				FetchConfig: http.FetchConfig{
-					allow_redirect: true
-				}
-			}) or {
-				println(term.red('gradle 下载失败: ${err}'))
-				exit(1)
+	// zip 与解压后的 gradle/ 都放 script 目录 (与 CI 内置 zip 同一位置, clean 只清 cache 不会删)
+	zip_path := common.path_add(common.Dirs{}.script, zip_name)
+	if !os.is_file(zip_path) {
+		println(term.dim('gradle: 未找到, 开始自动下载准备 (仅首次)...'))
+		os.mkdir_all(common.Dirs{}.script)!
+		url := 'https://services.gradle.org/distributions/${zip_name}'
+		res := http.download_file_with_progress(url, zip_path, http.DownloaderParams{
+			FetchConfig: http.FetchConfig{
+				allow_redirect: true
 			}
-			if res.status_code != 200 {
-				println(term.red('gradle 下载失败, 状态码: ${res.status_code}'))
-				exit(1)
-			}
-			zip_path = cache_zip
+		}) or {
+			println(term.red('gradle 下载失败: ${err}'))
+			exit(1)
 		}
+		if res.status_code != 200 {
+			println(term.red('gradle 下载失败, 状态码: ${res.status_code}'))
+			exit(1)
+		}
+	} else {
+		println(term.dim('gradle: 使用内置 ${zip_path}'))
 	}
 	// 解压 (zip 顶层为 gradle-8.9/ 目录)
 	tmp_dir := common.path_add(common.Dirs{}.cache, 'gradle-extract')
@@ -203,8 +193,15 @@ fn download_gradle(bin string) !string {
 		println(term.red('gradle 解压结构异常: 未找到 ${extracted}'))
 		exit(1)
 	}
-	os.mv(extracted, common.path_add(common.Dirs{}.script, 'gradle'))!
+	// 移除旧的 script/gradle 目录, 防止 os.mv 覆盖失败
+	gradle_dir := common.path_add(common.Dirs{}.script, 'gradle')
+	os.rmdir_all(gradle_dir) or {}
+	os.mv(extracted, gradle_dir)!
 	os.rmdir_all(tmp_dir) or {}
+	// Unix 下确保 gradle 二进制可执行 (zip 解压可能未保留权限)
+	$if linux || macos {
+		os.chmod(bin, 0o755) or {}
+	}
 	if !os.is_file(bin) {
 		println(term.red('gradle 准备失败: 未找到 ${bin}'))
 		exit(1)
