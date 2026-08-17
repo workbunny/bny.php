@@ -169,13 +169,12 @@ fn get_bodys(path string, ignore []string) ![]string {
 	mut body := []string{}
 	arr := os.glob(common.path_add(path, '*'))!
 	for i in arr {
-		p := common.path_add(path, i) // 完整路径
 		// 过滤
-		if common.filter_path(p, ignore) {
+		if common.filter_path(i, ignore) {
 			continue
 		}
-		name := common.file_name_ext(p)
-		if os.is_dir(p) {
+		name := common.file_name_ext(i)
+		if os.is_dir(i) {
 			body << '<File>'
 			body << '  <Type>3</Type>'
 			body << '  <Name>${name}</Name>'
@@ -184,14 +183,14 @@ fn get_bodys(path string, ignore []string) ![]string {
 			body << '  <OverwriteAttributes>False</OverwriteAttributes>'
 			body << '  <HideFromDialogs>0</HideFromDialogs>'
 			body << '  <Files>'
-			body << get_bodys(p, ignore)!
+			body << get_bodys(i, ignore)!
 			body << '  </Files>'
 			body << '</File>'
 		} else {
 			body << '<File>'
 			body << '  <Type>2</Type>'
 			body << '  <Name>${name}</Name>'
-			body << '  <File>${p}</File>'
+			body << '  <File>${i}</File>'
 			body << '  <ActiveX>False</ActiveX>'
 			body << '  <ActiveXInstall>False</ActiveXInstall>'
 			body << '  <Action>0</Action>'
