@@ -127,6 +127,8 @@ bny compile index.php -o myapp -icon app.ico
 
 ### Android 打包
 
+php 版本固定`8.5`
+
 ```sh
 bny android .                                # debug 包, 双架构(真机+模拟器)
 bny android ./index.php                      # 指定入口文件, 以其所在目录为项目根

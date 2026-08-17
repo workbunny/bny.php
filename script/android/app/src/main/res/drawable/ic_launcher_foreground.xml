@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 前景层: 引用独立资源 ic_launcher_fg (不能用 ic_launcher, anydpi-v26 下会循环引用自身), inset 20% 落在遮罩安全区内 -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@mipmap/ic_launcher_fg"
+    android:inset="20%" />

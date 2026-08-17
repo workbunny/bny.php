@@ -45,15 +45,13 @@ fn apply_brand(conf common.BnyConfig, project string) ! {
 		exit(1)
 	}
 	// 复制到各密度 mipmap 目录
+	// ic_launcher.png: legacy 图标 (Android <8)
+	// ic_launcher_fg.png: 自适应图标前景位图 (不能叫 ic_launcher, 会与 anydpi-v26 的 xml 循环引用)
 	for dpi in ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'] {
 		mipmap_dir := common.path_add(project, 'app', 'src', 'main', 'res', 'mipmap-' + dpi)
 		os.mkdir_all(mipmap_dir)!
 		os.cp_all(icon_path, common.path_add(mipmap_dir, 'ic_launcher.png'), true)!
-	}
-	// 删除自适应图标 xml (存在才删)
-	anydpi := common.path_add(project, 'app', 'src', 'main', 'res', 'mipmap-anydpi-v26', 'ic_launcher.xml')
-	if os.is_file(anydpi) {
-		os.rm(anydpi)!
+		os.cp_all(icon_path, common.path_add(mipmap_dir, 'ic_launcher_fg.png'), true)!
 	}
 }
 
