@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">App</string>
+    <string name="status_deploying">正在部署应用 …</string>
+    <string name="status_starting">正在启动服务 …</string>
+    <string name="status_loading">服务已启动，正在加载页面 …</string>
+    <string name="status_stopping">正在关闭服务 …</string>
+    <string name="status_failed">启动失败</string>
+    <string name="retry">重试</string>
+    <string name="press_back_again">再按一次返回键退出</string>
+</resources>

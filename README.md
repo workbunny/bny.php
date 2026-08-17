@@ -137,7 +137,8 @@ bny android . -o myapp -icon icon.png        # 产物名与图标
 bny android . -ver 2.0 -code 20              # 版本名/版本号
 ```
 
-`-arch` / `-ver` / `-code` / `-o` / `-icon` 等命令行选项优先级高于 `bny.json` 配置。与 compile 一致：`.` 走当前目录（有 `bny.json` 则读取），指定入口文件则以入口所在目录为项目根（产物名默认按入口文件名推导）。
+`-arch` / `-ver` / `-code` / `-o` / `-icon` 等命令行选项优先级高于 `bny.json` 配置。
+与 compile 一致：`.` 走当前目录（有 `bny.json` 则读取），指定入口文件则以入口所在目录为项目根（产物名默认按入口文件名推导）。
 
 环境要求（需自行准备，环境变量方式配置）：
 
@@ -150,7 +151,7 @@ bny android . -ver 2.0 -code 20              # 版本名/版本号
 |------|------|------|------|
 | `port` | int | `8787` | 服务端口，App 内 WebView 访问 `http://127.0.0.1:<port>` |
 | `start` | string | `-S 127.0.0.1:8787 ./` | 启动命令。默认为 php 内置服务器；框架项目守护化（如 `./start.php start -d`） |
-| `stop` | string | 空 | 停止命令。留空为前台模式（App 退出时直接结束进程）；框架项目填 `./start.php stop` 优雅停止 |
+| `stop` | string | 空 | 停止命令。留空为前台模式（App 退出时直接结束进程）；webman框架项目填 `./start.php stop` 优雅停止 |
 | `arch` | string | `all` | 架构：`aarch64`（真机）/ `x86_64`（模拟器）/ `all`（双架构） |
 | `ver` | string | `1.0` | 版本名 (versionName) |
 | `code` | int | `1` | 版本号 (versionCode) |
@@ -187,7 +188,8 @@ bny android . -ver 2.0 -code 20              # 版本名/版本号
 ```
 
 说明：
-- 适用常驻服务型 PHP 项目：框架项目（webman/workerman 等）`start` 守护化、配 `stop` 优雅停止；内置服务器（`php -S`）`start` 填 php 选项、不配 `stop`，App 打开自动启动、退出自动停止
+- 适用常驻服务型 PHP 项目：框架项目（webman/workerman 等）`start` 守护化、配 `stop` 优雅停止；
+- 内置服务器（`php -S`）`start` 填 php 选项、不配 `stop`，App 打开自动启动、退出自动停止
 - `ignore` 与 compile 一致：命中的文件/文件夹不会打包进 apk（如 `runtime/`、`.git/`，默认已含）
 - 产物：`<name>-v<版本>-<debug|release>.apk`，`adb install -r` 安装
 - 真机为 arm64-v8a，模拟器（如 MuMu）为 x86_64

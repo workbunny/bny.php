@@ -1,5 +1,7 @@
 cli.exe
 win32.exe
+elfpatch.exe
 cli
+elfpatch
 gradle/
 gradle-8.9-bin.zip

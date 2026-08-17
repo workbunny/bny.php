@@ -142,7 +142,7 @@ pub fn get_android_url(arch string) !string {
 
 // 比较版本号 按 . 拆成数字逐段比较
 // 返回 1 表示 a>b, -1 表示 a<b, 0 表示相等 (如 8.5.1 > 8.5 > 8.4.9)
-fn compare_version(a string, b string) int {
+pub fn compare_version(a string, b string) int {
 	arr_a := a.split('.')
 	arr_b := b.split('.')
 	length := if arr_a.len > arr_b.len { arr_a.len } else { arr_b.len }

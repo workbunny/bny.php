@@ -181,7 +181,7 @@ fn dump_help_android() ! {
 	arr << ''
 	arr << term.green('  -h                          ') + '帮助查看'
 	arr << term.green('  -arch [aarch64/x86_64/all]  ') + '指定架构,默认all'
-	arr << term.green('  -release                    ') + '打release包(未签名),默认debug'
+	arr << term.green('  -release [CN]               ') + '打release包(自动签名)'
 	arr << term.green('  -ver [x.y]                  ') + '版本名,默认1.0'
 	arr << term.green('  -code [n]                   ') + '版本号,默认1'
 	arr << term.green('  -o [name]                   ') + '应用名称'

@@ -71,23 +71,21 @@ jobs:
         run: |
           & C:\v\v\v.exe -os windows script/cli.v -o script/cli.exe
           & C:\v\v\v.exe -cc gcc -os windows script/win32.v -o script/win32.exe
-
-      - name: Download gradle
-        run: |
-          curl -fsSL -o script/gradle-8.9-bin.zip https://services.gradle.org/distributions/gradle-8.9-bin.zip
+          & C:\v\v\v.exe -os windows script/elfpatch.v -o script/elfpatch.exe
 
       - name: Prepare release package
         run: |
           New-Item -ItemType Directory -Force -Path release/bny/script
           Copy-Item bny.exe release/bny/
+          Copy-Item icon.ico release/bny/ -ErrorAction SilentlyContinue
           Copy-Item icon.png release/bny/ -ErrorAction SilentlyContinue
           Copy-Item README.md release/bny/
           Copy-Item script/enigmavbconsole.exe release/bny/script/
           Copy-Item script/rcedit-x64.exe release/bny/script/
           Copy-Item script/cli.exe release/bny/script/
           Copy-Item script/win32.exe release/bny/script/
+          Copy-Item script/elfpatch.exe release/bny/script/
           Copy-Item script/android release/bny/script/ -Recurse -ErrorAction SilentlyContinue
-          Copy-Item script/gradle-8.9-bin.zip release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -126,22 +124,20 @@ jobs:
       - name: Build cli
         run: |
           v -os linux script/cli.v -o script/cli
-
-      - name: Download gradle
-        run: |
-          curl -fsSL -o script/gradle-8.9-bin.zip https://services.gradle.org/distributions/gradle-8.9-bin.zip
+          v -os linux script/elfpatch.v -o script/elfpatch
 
       - name: Prepare release package
         run: |
           mkdir -p release/bny/script
           cp bny release/bny/
+          cp icon.ico release/bny/ || true
           cp icon.png release/bny/ || true
           cp README.md release/bny/
           cp script/appimagetool-x86_64.AppImage release/bny/script/
           cp script/runtime-x86_64 release/bny/script/
           cp script/cli release/bny/script/
+          cp script/elfpatch release/bny/script/
           cp -r script/android release/bny/script/android
-          cp script/gradle-8.9-bin.zip release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -180,22 +176,20 @@ jobs:
       - name: Build cli
         run: |
           v -os linux script/cli.v -o script/cli
-
-      - name: Download gradle
-        run: |
-          curl -fsSL -o script/gradle-8.9-bin.zip https://services.gradle.org/distributions/gradle-8.9-bin.zip
+          v -os linux script/elfpatch.v -o script/elfpatch
 
       - name: Prepare release package
         run: |
           mkdir -p release/bny/script
           cp bny release/bny/
+          cp icon.ico release/bny/ || true
           cp icon.png release/bny/ || true
           cp README.md release/bny/
           cp script/appimagetool-aarch64.AppImage release/bny/script/
           cp script/runtime-aarch64 release/bny/script/
           cp script/cli release/bny/script/
+          cp script/elfpatch release/bny/script/
           cp -r script/android release/bny/script/android
-          cp script/gradle-8.9-bin.zip release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -234,20 +228,18 @@ jobs:
       - name: Build cli
         run: |
           v -os macos script/cli.v -o script/cli
-
-      - name: Download gradle
-        run: |
-          curl -fsSL -o script/gradle-8.9-bin.zip https://services.gradle.org/distributions/gradle-8.9-bin.zip
+          v -os macos script/elfpatch.v -o script/elfpatch
 
       - name: Prepare release package
         run: |
           mkdir -p release/bny/script
           cp bny release/bny/
+          cp icon.ico release/bny/ || true
           cp icon.png release/bny/ || true
           cp README.md release/bny/
           cp script/cli release/bny/script/
+          cp script/elfpatch release/bny/script/
           cp -r script/android release/bny/script/android
-          cp script/gradle-8.9-bin.zip release/bny/script/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
