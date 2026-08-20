@@ -12,7 +12,7 @@ pub:
 pub struct Info {
 pub mut:
 	name     string = 'bny'
-	version  string = 'v0.1.1'
+	version  string = 'v0.1.3'
 	php      int = -1
 	php_list []PhpList
 }
