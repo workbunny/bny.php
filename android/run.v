@@ -38,8 +38,12 @@ pub fn run() ! {
 	code := cmdline.option(args, '-code', conf.android.code.str())
 	println(term.green('开始打包 Android 项目...'))
 	// 环境预检
-	checked()
+	checked()!
 	// 签名准备 (release: 复用或生成 keystore, 需在组装工程前确定签名文件名以排除出 assets)
+	// CN 优先级: 命令行 -release [CN] > android.sign (bny.json 字符串) > 默认 (默认在 sign.v 内处理)
+	if cert_cn == '' {
+		cert_cn = conf.android.sign
+	}
 	mut sign := Signing{}
 	if release {
 		sign = prepare_signing(conf, cert_cn)!

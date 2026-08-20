@@ -187,6 +187,12 @@ fn dump_help_android() ! {
 	arr << term.green('  -o [name]                   ') + '应用名称'
 	arr << term.green('  -icon [file]                ') + '应用图标(PNG)'
 	arr << ''
+	arr << term.yellow('release 签名:')
+	arr << ''
+	arr << term.blue('  自动生成 <name>.keystore, 可覆盖升级')
+	arr << term.blue('  android.sign: 证书 CN (等价 -release [CN]), 可用于 bny.json')
+	arr << term.blue('  CN 优先级: -release [CN] > android.sign > 默认 name.demo.com')
+	arr << ''
 	arr << term.yellow('环境要求:')
 	arr << ''
 	arr << term.blue('  JAVA_HOME                 ') + 'JDK 17+'

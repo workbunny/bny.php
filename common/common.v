@@ -24,6 +24,7 @@ pub mut:
 	arch  string = 'all'                 // 架构: aarch64 / x86_64 / all
 	ver   string = '1.0'                 // 版本名 (versionName)
 	code  int    = 1                     // 版本号 (versionCode)
+	sign  string                         // release 签名 CN, 等价于 -release <CN> (空则默认 name.demo.com)
 }
 
 pub struct BnyConfig {

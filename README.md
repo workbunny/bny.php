@@ -127,74 +127,7 @@ bny compile index.php -o myapp -icon app.ico
 
 ### Android 打包
 
-php 版本固定`8.5`
-
-```sh
-bny android .                                # debug 包, 双架构(真机+模拟器)
-bny android ./index.php                      # 指定入口文件, 以其所在目录为项目根
-bny android . -arch aarch64                  # 仅真机(arm64-v8a)
-bny android . -arch x86_64                   # 仅模拟器
-bny android . -release                       # release 包(未签名)
-bny android . -o myapp -icon icon.png        # 产物名与图标
-bny android . -ver 2.0 -code 20              # 版本名/版本号
-```
-
-`-arch` / `-ver` / `-code` / `-o` / `-icon` 等命令行选项优先级高于 `bny.json` 配置。
-与 compile 一致：`.` 走当前目录（有 `bny.json` 则读取），指定入口文件则以入口所在目录为项目根（产物名默认按入口文件名推导）。
-
-环境要求（需自行准备，环境变量方式配置）：
-
-| 变量 | 要求 |
-|------|------|
-| `JAVA_HOME` | JDK 17+ |
-| `ANDROID_HOME` | Android SDK（platform 34、build-tools 34） |
-
-| 字段 | 类型 | 默认 | 说明 |
-|------|------|------|------|
-| `port` | int | `8787` | 服务端口，App 内 WebView 访问 `http://127.0.0.1:<port>` |
-| `start` | string | `-S 127.0.0.1:8787 ./` | 启动命令。默认为 php 内置服务器；框架项目守护化（如 `./start.php start -d`） |
-| `stop` | string | 空 | 停止命令。留空为前台模式（App 退出时直接结束进程）；webman框架项目填 `./start.php stop` 优雅停止 |
-| `arch` | string | `all` | 架构：`aarch64`（真机）/ `x86_64`（模拟器）/ `all`（双架构） |
-| `ver` | string | `1.0` | 版本名 (versionName) |
-| `code` | int | `1` | 版本号 (versionCode) |
-
-框架项目示例：
-
-```json
-{
-    "title": "我的应用",
-    "name": "myapp",
-    "main": "./start.php",
-    "android": {
-        "port": 8787,
-        "start": "./start.php start -d",
-        "stop": "./start.php stop",
-        "arch": "aarch64",
-        "ver": "1.0",
-        "code": 1
-    }
-}
-```
-
-内置服务器自定义示例（纯 PHP 项目，无需 stop）：
-
-```json
-{
-    "name": "myapp",
-    "main": "./index.php",
-    "android": {
-        "port": 8787,
-        "start": "-S 127.0.0.1:8787 -t ./"
-    }
-}
-```
-
-说明：
-- 适用常驻服务型 PHP 项目：框架项目（webman/workerman 等）`start` 守护化、配 `stop` 优雅停止；
-- 内置服务器（`php -S`）`start` 填 php 选项、不配 `stop`，App 打开自动启动、退出自动停止
-- `ignore` 与 compile 一致：命中的文件/文件夹不会打包进 apk（如 `runtime/`、`.git/`，默认已含）
-- 产物：`<name>-v<版本>-<debug|release>.apk`，`adb install -r` 安装
-- 真机为 arm64-v8a，模拟器（如 MuMu）为 x86_64
+> 完整说明见 [ANDROID.md](ANDROID.md)：打包命令、配置、环境与 SDK 自动准备、签名、App 架构、以及 PHP/JS 桥接 Android 原生能力。
 
 ### 编译说明
 

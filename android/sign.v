@@ -22,7 +22,7 @@ mut:
  *   <name>.keystore.properties 凭据文件 (密码/别名)
  *
  * @param conf 配置
- * @param cert_cn 证书 CN (命令行 -release 指定, 空则按 项目名.demo.com)
+ * @param cert_cn 证书 CN (命令行 -release [CN] > bny.json android.sign; 空则按 项目名.demo.com)
  * @return 签名信息
  */
 fn prepare_signing(conf common.BnyConfig, cert_cn string) !Signing {

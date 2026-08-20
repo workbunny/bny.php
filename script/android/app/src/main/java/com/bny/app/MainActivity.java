@@ -3,11 +3,14 @@ package com.bny.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -34,10 +37,12 @@ public class MainActivity extends Activity {
     private TextView statusText;
     private Button retryButton;
     private long lastBackAt = 0;
+    private BridgeServer bridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupStatusBar();
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.webview);
         overlay = findViewById(R.id.overlay);
@@ -50,9 +55,46 @@ public class MainActivity extends Activity {
             }
         });
         setupWebView();
+        // 启动本地 socket 桥, 并按包名隔离暴露给 JS window.Android
+        bridge = new BridgeServer(this);
+        bridge.setWebView(webView);
+        bridge.start();
+        webView.addJavascriptInterface(new PhpBridge(this, bridge), "Android");
         // 注册任务移除回调, 划掉卡片时优雅停止 php
         startService(new Intent(this, PhpService.class));
         boot();
+    }
+
+    /**
+     * 保留系统状态栏(显示时间/电量), 但让状态栏透明、内容顶到其后。
+     * 这样顶部不再是色带，而是透过状态栏露出 WebView 内容自己的一色背景。
+     */
+    @SuppressWarnings("deprecation")
+    private void setupStatusBar() {
+        // 不全屏: 移除隐藏状态栏的 FLAG
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+        // 内容绘制到状态栏后方(edge-to-edge), 状态栏本身透明
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        // API 23+: 状态栏图标用深色(白色背景下才看得清时间/电量)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        }
+        getWindow().getDecorView().setSystemUiVisibility(flags);
+    }
+
+    /**
+     * 每次窗口重新获得焦点(如从通知栏/返回)后, 再重设一次, 避免状态栏被重置。
+     */
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            setupStatusBar();
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -144,6 +186,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        // 关闭本地 socket 桥并让挂起的 pickFile 全部结束
+        if (bridge != null) {
+            bridge.stop();
+        }
         // 退出即停止 (后台线程执行, stop 内部含 stop 命令/端口等待, 避免阻塞 UI)
         final PhpRuntime rt = PhpRuntime.get();
         if (rt != null) {
@@ -155,6 +201,22 @@ public class MainActivity extends Activity {
             }, "bny-stop").start();
         }
         super.onDestroy();
+    }
+
+    /**
+     * 文件选择器结果: 转发给 BridgeServer, 由其把结果写回挂起的 PHP socket (或回调 JS)。
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == BridgeServer.PICK_FILE_REQUEST && bridge != null) {
+            if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+                bridge.onPickResult(BridgeServer.uriToFile(this, data.getData()), false);
+            } else {
+                bridge.onPickResult(null, true);
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**

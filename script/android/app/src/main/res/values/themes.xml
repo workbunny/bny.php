@@ -4,7 +4,9 @@
         <item name="android:colorPrimary">#3D5AFE</item>
         <item name="android:colorPrimaryDark">#283593</item>
         <item name="android:colorAccent">#3D5AFE</item>
-        <item name="android:statusBarColor">#283593</item>
+        <!-- 状态栏透明 + 深色图标: 保留时间/电量, 内容透过状态栏露出网页底色(色调由代码 setupStatusBar 控制) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">#FFFFFF</item>
     </style>
 </resources>

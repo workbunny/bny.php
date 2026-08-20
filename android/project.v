@@ -41,10 +41,11 @@ fn build_project(conf common.BnyConfig) !string {
 	// 铺项目文件到 assets/app (指定入口文件时, 入口所在目录为项目根)
 	assets_app := common.path_add(dir, 'app', 'src', 'main', 'assets', 'app')
 	os.mkdir_all(assets_app)!
-	// 签名文件不出现在 assets 里 (纯名称规则, 任意层级命中)
+	// 签名/构建产物不出现在 assets 里 (纯名称规则, 任意层级命中)
 	mut ignore := conf.ignore.clone()
 	ignore << '${conf.name}.keystore'
 	ignore << '${conf.name}.keystore.properties'
+	ignore << '*.apk' // 之前打包的 apk 若在项目根, 不能裹进新包(否则会逐次翻倍变大)
 	copy_project(conf.root, assets_app, ignore)!
 	// 复制壳模板自带的 payload_extra
 	os.cp_all(common.path_add(dir, 'payload_extra', 'usr'), common.path_add(dir, 'app',
@@ -125,15 +126,38 @@ fn filter_ignore(rel string, ignore []string) bool {
 				return true
 			}
 		} else {
-			// 纯名称: 任意一层命中即忽略
+			// 纯名称: 任意一层命中即忽略 (支持 *.ext 后缀通配)
 			for s in segs {
-				if s == p {
+				if match_seg(s, p) {
 					return true
 				}
 			}
 		}
 	}
 	return false
+}
+
+/**
+ * 名称段匹配 (支持简单通配)
+ * 仅当 pattern 不含 '/' 且含 '*' 时做通配: *.ext 后缀匹配 / pre* 前缀匹配 / *sub* 包含匹配
+ * 否则做精确匹配
+ *
+ * @param seg 名称段
+ * @param pattern 匹配规则
+ * @return 是否命中
+ */
+fn match_seg(seg string, pattern string) bool {
+	if pattern.contains('*') {
+		if pattern.starts_with('*') && pattern.ends_with('*') {
+			sub := pattern[1..pattern.len - 1]
+			return sub == '' || seg.contains(sub)
+		} else if pattern.starts_with('*') {
+			return seg.ends_with(pattern[1..])
+		} else if pattern.ends_with('*') {
+			return seg.starts_with(pattern[..pattern.len - 1])
+		}
+	}
+	return seg == pattern
 }
 
 /**
@@ -192,7 +216,7 @@ fn manifest_files(dir string, prefix string, mut files map[string]string) ! {
  * @param project 工程目录
  */
 fn write_local_properties(project string) ! {
-	sdk := os.getenv('ANDROID_HOME')
+	sdk := ensure_sdk()!
 	// properties 转义: 先 \ -> \\, 再 : -> \:
 	esc := sdk.replace('\\', '\\\\').replace(':', '\\:')
 	os.write_file(common.path_add(project, 'local.properties'), 'sdk.dir=${esc}\n')!

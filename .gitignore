@@ -36,3 +36,4 @@ cache/
 
 *.def
 .trae
+script/android-sdk/
