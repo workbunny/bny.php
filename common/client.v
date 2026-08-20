@@ -11,8 +11,8 @@ struct Lists {
 
 const client = s3.new_client(s3.Credentials{
 	endpoint:          'https://07cdb9614bf61acdd41411c8d123d08c.r2.cloudflarestorage.com'
-	access_key_id:     '9d8c6ad2bb2a231b8f9217ebe0e9ac9a'
-	secret_access_key: '98c6d2c61540265f14c9ebfc58a0949da0ca9e097241460c6e25d5148f3ed030'
+	access_key_id:     '__R2_ACCESS_KEY_ID__'
+	secret_access_key: '__R2_SECRET_ACCESS_KEY__'
 	bucket:            'bny-php'
 	region:            'auto'
 })
