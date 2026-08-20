@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -19,6 +20,9 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * WebView 壳入口
@@ -208,12 +212,23 @@ public class MainActivity extends Activity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == BridgeServer.PICK_FILE_REQUEST && bridge != null) {
-            if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-                bridge.onPickResult(BridgeServer.uriToFile(this, data.getData()), false);
-            } else {
-                bridge.onPickResult(null, true);
+        if ((requestCode == BridgeServer.PICK_FILE_REQUEST
+                || requestCode == BridgeServer.PICK_FILES_REQUEST) && bridge != null) {
+            List<String> paths = new ArrayList<>();
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                if (data.getData() != null) {
+                    paths.add(BridgeServer.uriToFile(this, data.getData()));
+                }
+                if (data.getClipData() != null && data.getClipData().getItemCount() > 0) {
+                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                        Uri u = data.getClipData().getItemAt(i).getUri();
+                        if (u != null) {
+                            paths.add(BridgeServer.uriToFile(this, u));
+                        }
+                    }
+                }
             }
+            bridge.onPickResults(paths, resultCode != Activity.RESULT_OK || paths.isEmpty());
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);

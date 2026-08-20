@@ -138,101 +138,217 @@ APK 内嵌：
 
 ## 6. PHP / JS 调用 Android 原生能力（桥接）
 
-APK 内置一个本地 Unix socket 桥（`BridgeServer`），监听于 App 私有目录：
+桥接代码实现了 **12 个能力**（PHP socket 与 WebView JS 侧共用同一套原生实现），本节对每个能力给出：说明、参数、请求/响应、PHP 示例、JS 示例与注意事项。
+
+### 6.1 socket 与协议
+
+APK 内置本地 Unix socket 桥（`BridgeServer`），监听于 App 私有目录：
 
 ```
 unix:///data/data/com.bny.app/files/bridge.sock
 ```
 
-路径按包名隔离（`applicationId` 固定为 `com.bny.app`），不与其他 App 冲突。
-桥随 App 启动而开启：应用运行时才能连接；App 退出后 socket 关闭。
+路径按包名隔离（`applicationId` 固定为 `com.bny.app`），不与其他 App 冲突。桥随 App 启动而开启：应用运行时才能连接；退出后 `stop()` 关闭 socket 并向挂起的请求回 `error=bridge stopped`。
 
-### 协议
-
-换行分隔的 JSON。**一行请求 → 一行响应**（`pickFile` 例外，见下）。请求：
+协议为换行分隔 JSON，请求：
 
 ```json
 {"id": 1, "cmd": "toast", "params": {"message": "hi"}}
 ```
 
-- `id`：数字，用于把响应和请求对应起来（建议自增）；
-- `cmd`：命令名；
-- `params`：该命令的参数对象（无则传 `{}`）。
+- `id`：数字，把响应与请求对应（建议自增）；
+- `cmd`：命令名；`params`：参数对象（无则 `{}`）。
 
 响应：
 
 ```json
 {"id": 1, "ok": true, "data": {"key": "value"}}
-```
-
-```json
 {"id": 1, "ok": false, "error": "错误信息"}
 ```
 
-> 无返回数据的成功命令（如 `toast`）响应里**没有 `data` 字段**。`id` 与请求一致。
+> 无返回数据的成功命令（`toast`/`clipboard_set`/`vibrate`/`openUrl`）响应里**没有 `data` 字段**；`id` 回显请求里的 `id`。
 
-### 支持的命令
+### 6.2 命令总览
 
-| 命令 | 类型 | params | 成功时 `data` |
-|------|------|--------|--------------|
-| `toast` | 同步 | `message`（必需）、`long`（可选 bool，默认 false） | 无 |
-| `getUid` | 同步 | - | 应用 uid（数字） |
-| `getVersion` | 同步 | - | 对象：`versionName`、`build` |
-| `clipboard_get` | 同步 | - | 剪贴板文本（字符串） |
+| 命令 | 类型 | 参数 | 成功时 `data` |
+|------|------|------|--------------|
+| `toast` | 同步 | `message`（必需）、`long`（可选） | 无 |
+| `getUid` | 同步 | - | 数字 uid |
+| `getVersion` | 同步 | - | 对象 `versionName`/`build` |
+| `clipboard_get` | 同步 | - | 字符串 |
 | `clipboard_set` | 同步 | `text`（必需） | 无 |
 | `vibrate` | 同步 | `durationMs`（可选，默认 200） | 无 |
 | `openUrl` | 同步 | `url`（必需） | 无 |
-| `pickFile` | **异步** | `mime`（可选，默认 `*/*`） | 对象：`path`（文件路径） |
+| `pickFile` | **异步** | `mime`（可选，默认 `*/*`） | 对象 `path` |
+| `pickFiles` | **异步** | `mime`（可选，默认 `*/*`） | 对象 `paths`（数组） |
+| `pickImages` | **异步** | - | 对象 `paths`（数组） |
+| `openFile` | 同步 | `path`（必需）、`mime`（可选） | 无 |
+| `listDir` | 同步 | `path`（必需） | 对象 `path`/`entries` |
 
-#### 同步命令示例（请求 → 响应）
+### 6.3 逐功能详解
 
-```json
-// toast
-{"id":1,"cmd":"toast","params":{"message":"你好","long":true}}
-{"id":1,"ok":true}
+#### ① toast —— 顶部气泡提示
 
-// getUid → data 为数字
-{"id":2,"cmd":"getUid","params":{}}
-{"id":2,"ok":true,"data":10881}
+显示一条短暂的气泡提示。
 
-// getVersion → data 为对象
-{"id":3,"cmd":"getVersion","params":{}}
-{"id":3,"ok":true,"data":{"versionName":"1.0","build":1}}
+- 参数：`message`（内容，必须）、`long`（bool，可选，`true` 显示更久）。
+- 请求/响应：
+  ```json
+  {"id":1,"cmd":"toast","params":{"message":"你好","long":true}}
+  {"id":1,"ok":true}
+  ```
+- PHP：`bridge_call($sock, 'toast', ['message' => '你好', 'long' => true]);`
+- JS：`window.Android.showToast('你好');`（JS 侧固定短时长）
 
-// clipboard_get / clipboard_set
-{"id":4,"cmd":"clipboard_get","params":{}}
-{"id":4,"ok":true,"data":"剪贴板里的内容"}
-{"id":5,"cmd":"clipboard_set","params":{"text":"新的剪贴板内容"}}
-{"id":5,"ok":true}
+#### ② getUid —— 获取应用 UID
 
-// vibrate / openUrl
-{"id":6,"cmd":"vibrate","params":{"durationMs":300}}
-{"id":6,"ok":true}
-{"id":7,"cmd":"openUrl","params":{"url":"https://example.com"}}
-{"id":7,"ok":true}
-```
+返回当前应用的 Linux UID（数字），用于识别 App 身份。
 
-`pickFile` 为**异步**：发出请求后连接挂起、socket 不关闭；用户选择文件后回写一行（取消则 `error=cancelled`）：
+- 请求/响应：
+  ```json
+  {"id":2,"cmd":"getUid","params":{}}
+  {"id":2,"ok":true,"data":10881}
+  ```
+- PHP：`$uid = bridge_call($sock, 'getUid')['data'];`
+- JS：`var uid = window.Android.getUid();`（返回字符串）
 
-```json
-{"id":8,"cmd":"pickFile","params":{"mime":"image/*"}}
-{"id":8,"ok":true,"data":{"path":"/storage/emulated/0/Download/a.jpg"}}
-```
+#### ③ getVersion —— 获取应用版本
 
-#### 失败响应的 `error`
+返回版本名与版本号（来自包信息）。
 
-| 场景 | 返回 `error` |
-|------|-------------|
-| `toast` 缺 `message` | `missing message` |
-| `clipboard_set` 缺 `text` | `missing text` |
-| `openUrl` 缺 `url` | `missing url` |
-| 未知名命令 | `unknown cmd: <cmd>` |
-| JSON 解析失败 | `invalid request` |
-| `pickFile` 用户取消 | `cancelled` |
+- 请求/响应：
+  ```json
+  {"id":3,"cmd":"getVersion","params":{}}
+  {"id":3,"ok":true,"data":{"versionName":"1.0","build":1}}
+  ```
+- PHP：`$ver = bridge_call($sock, 'getVersion')['data']; // $ver['versionName'], $ver['build']`
+- JS：无对应 JS 方法（仅 PHP socket）。
 
-### PHP 侧完整示例
+#### ④ clipboard_get / clipboard_set —— 剪贴板读写
 
-> PHP 需启用 `sockets` 或 `stream` 扩展；以下用 `stream_socket_client`。
+读写系统剪贴板（主剪贴板）。
+
+- `clipboard_get`：无参数，成功 `data` 为剪贴板文本；剪贴板为空或无文本时返回空字符串 `""`。
+  ```json
+  {"id":4,"cmd":"clipboard_get","params":{}}
+  {"id":4,"ok":true,"data":"剪贴板里的内容"}
+  ```
+- `clipboard_set`：参数 `text`（内容，必须），无返回 `data`。
+  ```json
+  {"id":5,"cmd":"clipboard_set","params":{"text":"新的剪贴板内容"}}
+  {"id":5,"ok":true}
+  ```
+- 注意：Android 10+ 限制后台应用读取剪贴板；本桥在 App 前台运行时读取可用。App 无前台焦点时 `clipboard_get` 可能返回空。
+- PHP：见 6.4 示例 `bridge_call`。
+- JS：`var txt = window.Android.clipboardGet();`、`window.Android.clipboardSet('hi');`
+
+#### ⑤ vibrate —— 震动
+
+触动设备震动指定毫秒数。
+
+- 参数：`durationMs`（int，可选，默认 `200`）。
+- 请求/响应：
+  ```json
+  {"id":6,"cmd":"vibrate","params":{"durationMs":300}}
+  {"id":6,"ok":true}
+  ```
+- 注意：设备无震动马达时该命令**静默返回成功**（不报错）。
+- PHP：`bridge_call($sock, 'vibrate', ['durationMs' => 300]);`
+- JS：`window.Android.vibrate(200);`
+
+#### ⑥ openUrl —— 用默认浏览器打开链接
+
+用系统 `ACTION_VIEW` 打开一个 URL（网页/跳转外部应用）。
+
+- 参数：`url`（必须）。
+- 请求/响应：
+  ```json
+  {"id":7,"cmd":"openUrl","params":{"url":"https://example.com"}}
+  {"id":7,"ok":true}
+  ```
+- 注意：当前页面会切到系统浏览器/对应应用打开；`url` 为空返回 `error=missing url`。
+- PHP：`bridge_call($sock, 'openUrl', ['url' => 'https://example.com']);`
+- JS：`window.Android.openUrl('https://example.com');`
+
+#### ⑦ pickFile —— 选择文件（**异步**）
+
+拉起系统文件选择器（`ACTION_GET_CONTENT`），按 `mime` 过滤类型。
+
+- 参数：`mime`（可选，默认 `*/*`），如 `image/*`、`text/plain`、`application/pdf`。
+- **异步行为**：发出请求后连接挂起、socket 不关闭（区别于 6 个同步命令的一行一答）；用户选完文件后，App 回写一行并**关闭该连接**。返回的 `path` 会把 `content://` 尝试解析为真实文件路径，失败时回退为原始 `content://...` 字符串。
+- 请求/响应（成功、取消）：
+  ```json
+  {"id":8,"cmd":"pickFile","params":{"mime":"image/*"}}
+  {"id":8,"ok":true,"data":{"path":"/storage/emulated/0/Download/a.jpg"}}
+
+  {"id":8,"cmd":"pickFile","params":{"mime":"*/*"}}
+  {"id":8,"ok":false,"error":"cancelled"}
+  ```
+- PHP：因是异步，用单独的等待函数（见 6.4 的 `bridge_pick`）。
+- JS：`window.Android.pickFile('*/*');`，结果异步回调 `window.bnyOnPick(res)`，`res = {path, canceled}`。
+
+#### ⑧ pickFiles —— 选择本地文件（**异步·可多选**）
+
+拉起系统文件选择器并**多选**本地文件，按 `mime` 过滤类型。
+
+- 参数：`mime`（可选，默认 `*/*`）。
+- 异步行为同 `pickFile`；成功返回 `data.paths`（字符串数组，每个元素为文件路径，`content://` 尽可能解析为真实路径）。
+- 请求/响应：
+  ```json
+  {"id":9,"cmd":"pickFiles","params":{"mime":"application/pdf"}}
+  {"id":9,"ok":true,"data":{"paths":["/sdcard/a.pdf","/sdcard/b.pdf"]}}
+
+  {"id":9,"cmd":"pickFiles","params":{}}
+  {"id":9,"ok":false,"error":"cancelled"}
+  ```
+- PHP：`bridge_pick_multi($sock, 'application/pdf')` → 路径数组或 `null`（取消，见 6.4）。
+- JS：`window.Android.pickFiles('*/*');`，`window.bnyOnPick(res).paths` 为数组。
+
+#### ⑨ pickImages —— 相册多选图片（**异步·可多选**）
+
+拉起系统图片选择器（相册/图库），可一次选多张图；等价于 `pickFiles` 固定 `mime=image/*` 且多选。
+
+- 无参数。
+- 请求/响应（成功 `data.paths` 数组；取消 `error=cancelled`）：
+  ```json
+  {"id":10,"cmd":"pickImages","params":{}}
+  {"id":10,"ok":true,"data":{"paths":["/storage/emulated/0/Download/a.jpg","/storage/emulated/0/Download/b.png"]}}
+  ```
+- PHP：`bridge_pick_multi($sock, 'image/*')`（或直接用 `pickImages`）。
+- JS：`window.Android.pickImages();`，结果在 `window.bnyOnPick(res).paths`。
+
+#### ⑩ openFile —— 用系统查看器打开文件
+
+把某个文件（本地路径或 `content://` URI）交给系统对应应用查看（看图、PDF、文本等）。
+
+- 参数：`path`（必需，可为真实路径或 `content://...`）、`mime`（可选，帮助系统选应用）。
+- 请求/响应：
+  ```json
+  {"id":11,"cmd":"openFile","params":{"path":"/sdcard/Documents/报告.pdf","mime":"application/pdf"}}
+  {"id":11,"ok":true}
+  ```
+- 错误：`path` 为空 → `error=missing path`；系统无可用查看器 → `error=no viewer for: <path>`。
+- PHP：`bridge_call($sock, 'openFile', ['path' => $p, 'mime' => 'application/pdf']);`
+- JS：`window.Android.openFile('/sdcard/a.pdf', 'application/pdf');`
+
+#### ⑪ listDir —— 列出本地目录内容
+
+按路径列出目录下的文件与子目录（App 有权限访问的目录，如 App 私有目录、已授权可读路径）。
+
+- 参数：`path`（必需）。
+- 成功 `data`：
+  ```json
+  {"id":12,"cmd":"listDir","params":{"path":"/sdcard/Download"}}
+  {"id":12,"ok":true,"data":{"path":"/sdcard/Download","entries":[{"name":"a.jpg","isDir":false,"size":12345,"modified":1690000000000},{"name":"sub","isDir":true,"size":0,"modified":1690000000000}]}}
+  ```
+  `entries` 每项：`name`（名称）、`isDir`（是否目录）、`size`（字节，目录为 0）、`modified`（毫秒时间戳）。
+- 错误：`path` 为空 → `error=missing path`；不是目录/不可访问 → `error=not a directory: <path>`。
+- PHP：`bridge_call($sock, 'listDir', ['path' => '/sdcard/Download'])['data']['entries']`
+- JS：无对应 JS 方法（仅 PHP socket）。
+
+### 6.4 PHP 侧完整封装
+
+> 需启用 PHP `stream` 或 `sockets` 扩展；以下用 `stream_socket_client`。
 
 ```php
 <?php
@@ -265,7 +381,7 @@ function bridge_call($sock, string $cmd, array $params = []): array {
     return $resp;
 }
 
-/** pickFile：发出请求后连接挂起，需另读一行等回写，返回路径或 null（取消） */
+/** pickFile：异步，发出请求后连接挂起，需另读一行等回写；返回路径或 null（取消） */
 function bridge_pick($sock, string $mime = '*/*'): ?string {
     static $id = 9000;
     $req = json_encode(['id' => ++$id, 'cmd' => 'pickFile', 'params' => ['mime' => $mime]], JSON_UNESCAPED_UNICODE);
@@ -278,74 +394,110 @@ function bridge_pick($sock, string $mime = '*/*'): ?string {
     return $resp['ok'] ? ($resp['data']['path'] ?? null) : null;
 }
 
+/** pickFiles/pickImages 多选：返回路径数组，取消返回 null */
+function bridge_pick_multi($sock, string $cmd, string $mime = '*/*'): ?array {
+    static $id = 9100;
+    $params = $cmd === 'pickImages' ? [] : ['mime' => $mime];
+    $req = json_encode(['id' => ++$id, 'cmd' => $cmd, 'params' => $params], JSON_UNESCAPED_UNICODE);
+    fwrite($sock, $req . "\n");
+    $line = fgets($sock); // 阻塞直至用户选择/取消
+    $resp = json_decode($line, true);
+    if (!is_array($resp)) {
+        throw new RuntimeException("$cmd 响应无效: $line");
+    }
+    return $resp['ok'] ? ($resp['data']['paths'] ?? []) : null;
+}
+
+// 使用示例
 $sock = bridge_connect();
 
-// 1) 提示气泡
-bridge_call($sock, 'toast', ['message' => '你好，PHP!', 'long' => false]);
-
-// 2) 获取应用 uid
-$uid = bridge_call($sock, 'getUid')['data'];
-echo "uid=$uid\n";
-
-// 3) 获取应用版本
-$ver = bridge_call($sock, 'getVersion')['data'];
-echo "version={$ver['versionName']} build={$ver['build']}\n";
-
-// 4) 读写剪贴板
-$clip = bridge_call($sock, 'clipboard_get')['data'];
-bridge_call($sock, 'clipboard_set', ['text' => "PHP 写入: $clip"]);
-echo "clipboard=$clip\n";
-
-// 5) 震动 300ms
+bridge_call($sock, 'toast', ['message' => '准备读取设备信息']);
+$uid = bridge_call($sock, 'getUid')['data'];                  // 数字
+$ver = bridge_call($sock, 'getVersion')['data'];              // ['versionName', 'build']
+$clp = bridge_call($sock, 'clipboard_get')['data'];           // 字符串，可为 ""
+bridge_call($sock, 'clipboard_set', ['text' => '由 PHP 写入']);
 bridge_call($sock, 'vibrate', ['durationMs' => 300]);
-
-// 6) 打开网页
 bridge_call($sock, 'openUrl', ['url' => 'https://example.com']);
 
-// 7) 选择文件（异步，等待用户选择）
-$path = bridge_pick($sock, '*/*');
-if ($path !== null) {
-    echo "选择文件: $path\n";
-} else {
-    echo "已取消选择\n";
-}
+// 单选文件
+$path = bridge_pick($sock, '*/*');                            // 异步
+echo "选择文件: " . ($path ?? '(取消)') . "\n";
+
+// 多选本地文件
+$files = bridge_pick_multi($sock, 'pickFiles', 'application/pdf');
+foreach (($files ?? []) as $f) { echo "PDF: $f\n"; }
+
+// 相册多选图片
+$images = bridge_pick_multi($sock, 'pickImages');
+
+// 用系统查看器打开一个文件
+bridge_call($sock, 'openFile', ['path' => '/sdcard/Documents/报告.pdf', 'mime' => 'application/pdf']);
+
+// 列出目录内容
+$entries = bridge_call($sock, 'listDir', ['path' => '/sdcard/Download'])['data']['entries'];
+foreach ($entries as $e) { echo ($e['isDir'] ? '[D] ' : '    ') . $e['name'] . "\n"; }
 
 fclose($sock);
 ```
 
-### JS 侧完整示例
+### 6.5 JS 侧使用
 
-App 把同一个桥以 `window.Android` 暴露给 WebView 页面（`PhpBridge`，同步返回值直接可用；`pickFile` 为异步，结果经 `window.bnyOnPick` 回调）：
+App 把同一个桥以 `window.Android` 暴露给页面（`PhpBridge`；同步方法返回字符串，`pickFile` 异步、结果经 `window.bnyOnPick` 回调）：
 
 ```js
-// 提示气泡（JS 侧固定短时长）
+// toast（短时长）
 window.Android.showToast('Hello from JS');
 
-// 获取应用 uid（返回字符串）
+// getUid（返回字符串）
 var uid = window.Android.getUid();
 console.log('uid=', uid);
 
-// 读写剪贴板
+// 剪贴板读写
 var txt = window.Android.clipboardGet();
 window.Android.clipboardSet('hi ' + txt);
 
-// 震动 200ms
+// 震动
 window.Android.vibrate(200);
 
 // 打开网页
 window.Android.openUrl('https://example.com');
 
-// 选择文件：异步，需先注册回调再调用
+// 选择文件：先注册回调再调用（异步）
 window.bnyOnPick = function (res) {
-    // res = {path: "...", canceled: false}
-    if (res.canceled) {
-        console.log('user cancelled');
-        return;
-    }
-    console.log('picked=', res.path);
+    // 单选: res = {path: "...", canceled: false}
+    // 多选: res = {paths: [...], canceled: false}
+    if (res.canceled) { console.log('user cancelled'); return; }
+    if (Array.isArray(res.paths)) { console.log('picked=', res.paths); } else { console.log('picked=', res.path); }
 };
-window.Android.pickFile('*/*');
+window.Android.pickFile('*/*');   // 单选
+window.Android.pickFiles('*/*');  // 多选本地文件
+window.Android.pickImages();      // 相册多选图片
+
+// 用系统查看器打开文件
+window.Android.openFile('/sdcard/a.pdf', 'application/pdf');
 ```
+
+### 6.6 错误与注意事项
+
+| 触发条件 | `error` |
+|----------|---------|
+| `toast` 缺 `message` | `missing message` |
+| `clipboard_set` 缺 `text` | `missing text` |
+| `openUrl` 缺 `url` | `missing url` |
+| `openFile`/`listDir` 缺 `path` | `missing path` |
+| `openFile` 无可用查看器 | `no viewer for: <path>` |
+| `listDir` 目录不可访问/非目录 | `not a directory: <path>` |
+| 未知名命令 | `unknown cmd: <cmd>` |
+| JSON 解析失败 | `invalid request` |
+| `pickFile`/`pickFiles`/`pickImages` 取消 | `cancelled` |
+| App 退出，挂起的请求 | `bridge stopped` |
+
+- 同步命令一请求一响；`pickFile`/`pickFiles`/`pickImages` 例外（异步、发完保持连接直到用户选择）。别在选择命令没完成前复用同一连接发别的同步命令。
+- `pickFile` 返回 `data.path`；`pickFiles`/`pickImages` 返回 `data.paths`（数组）。
+- 上述选择命令返回的路径优先把 `content://` 解析为真实文件路径，解析不到时返回原始 `content://...` 字符串。
+- `listDir`/`openFile` 只能访问 App 有权限的目录（App 私有目录、已授权可读路径）；Android 分区存储下 `listDir('/sdcard/...')` 可能因权限返回 `not a directory`。
+- Android 10+ 后台无法读剪贴板；App 失焦时 `clipboard_get` 可能为空。
+- 无震动马达的设备上 `vibrate` 静默成功。
 
 ## 7. 产物与安装
 

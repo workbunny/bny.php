@@ -54,4 +54,28 @@ public class PhpBridge {
     public void pickFile(String mime) {
         bridge.pickFileFromJs(mime);
     }
+
+    /**
+     * 多选本地文件。结果为异步, 通过 window.bnyOnPick({paths,canceled}) 回调。
+     */
+    @JavascriptInterface
+    public void pickFiles(String mime) {
+        bridge.pickFilesFromJs(mime);
+    }
+
+    /**
+     * 相册多选图片。结果为异步, 通过 window.bnyOnPick({paths,canceled}) 回调。
+     */
+    @JavascriptInterface
+    public void pickImages() {
+        bridge.pickImagesFromJs();
+    }
+
+    /** 用系统对应应用打开一个文件 (路径或 content:// uri)。 */
+    @JavascriptInterface
+    public void openFile(String path, String mime) {
+        if (path != null) {
+            bridge.openFileFromJs(path, mime == null ? "" : mime);
+        }
+    }
 }

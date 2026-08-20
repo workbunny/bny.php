@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.WebView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -25,6 +26,9 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -46,6 +50,8 @@ public class BridgeServer {
 
     /** 文件选择请求码 (旧式 startActivityForResult) */
     public static final int PICK_FILE_REQUEST = 9001;
+    /** 文件/图片多选请求码 */
+    public static final int PICK_FILES_REQUEST = 9002;
 
     // 命令分派返回码
     private static final int KEEP = 0;       // 已回响应, 继续读下一行
@@ -57,10 +63,15 @@ public class BridgeServer {
         final long id;
         final OutputStream out;   // PHP socket 来源(用于回写), null 表示 JS 来源
         final WebView jsWebView;  // JS 来源(用于 evaluateJavascript 回调), null 表示 socket 来源
+        final boolean multi;      // 是否多选(pickFiles/pickImages)
         Pending(long id, OutputStream out, WebView jsWebView) {
+            this(id, out, jsWebView, false);
+        }
+        Pending(long id, OutputStream out, WebView jsWebView, boolean multi) {
             this.id = id;
             this.out = out;
             this.jsWebView = jsWebView;
+            this.multi = multi;
         }
     }
 
@@ -252,9 +263,40 @@ public class BridgeServer {
                 }
                 case "pickFile": {
                     String mime = params.optString("mime", "*/*");
-                    pendingPicks.add(new Pending(id, out, null));
-                    launchPick(mime);
+                    pendingPicks.add(new Pending(id, out, null, false));
+                    launchPick(mime, false);
                     return SUSPEND;
+                }
+                case "pickFiles": {
+                    // 多选本地文件 (mime 过滤, 默认全部)
+                    String mime = params.optString("mime", "*/*");
+                    pendingPicks.add(new Pending(id, out, null, true));
+                    launchPick(mime, true);
+                    return SUSPEND;
+                }
+                case "pickImages": {
+                    // 相册多选图片 (mime=image/*, multiple)
+                    pendingPicks.add(new Pending(id, out, null, true));
+                    launchPick("image/*", true);
+                    return SUSPEND;
+                }
+                case "openFile": {
+                    String path = params.optString("path", "");
+                    if (path.isEmpty()) {
+                        return respondError(out, id, "missing path");
+                    }
+                    String mime = params.optString("mime", "");
+                    if (openWithViewer(path, mime)) {
+                        return respondOk(out, id, null);
+                    }
+                    return respondError(out, id, "no viewer for: " + path);
+                }
+                case "listDir": {
+                    String path = params.optString("path", "");
+                    if (path.isEmpty()) {
+                        return respondError(out, id, "missing path");
+                    }
+                    return respondDir(out, id, path);
                 }
                 default:
                     return respondError(out, id, "unknown cmd: " + cmd);
@@ -322,6 +364,31 @@ public class BridgeServer {
         return CLOSE;
     }
 
+    /** listDir: 返回目录下文件/子目录列表 {path, entries:[{name,isDir,size,modified}]} */
+    private int respondDir(OutputStream out, long id, String path) throws Exception {
+        File dir = new File(path);
+        if (!dir.exists() || !dir.isDirectory()) {
+            return respondError(out, id, "not a directory: " + path);
+        }
+        File[] children = dir.listFiles();
+        JSONObject data = new JSONObject();
+        data.put("path", dir.getAbsolutePath());
+        JSONArray arr = new JSONArray();
+        if (children != null) {
+            Arrays.sort(children);
+            for (File c : children) {
+                JSONObject e = new JSONObject();
+                e.put("name", c.getName());
+                e.put("isDir", c.isDirectory());
+                e.put("size", c.isFile() ? c.length() : 0);
+                e.put("modified", c.lastModified());
+                arr.put(e);
+            }
+        }
+        data.put("entries", arr);
+        return respondOk(out, id, data);
+    }
+
     // ------------------------------------------------------------------
     // Native capability primitives (供 socket 与 PhpBridge 复用)
     // ------------------------------------------------------------------
@@ -384,47 +451,102 @@ public class BridgeServer {
         }
     }
 
+    /** 用系统对应应用打开文件; 成功返回 true, 无可用处理器时返回 false (由调用方决定是否报错) */
+    private boolean openWithViewer(String path, String mime) {
+        try {
+            Uri uri;
+            if (path.startsWith("content://") || path.startsWith("file://")) {
+                uri = Uri.parse(path);
+            } else {
+                uri = Uri.fromFile(new File(path));
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            if (mime == null || mime.isEmpty()) {
+                intent.setData(uri);
+            } else {
+                intent.setDataAndType(uri, mime);
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            activity.startActivity(intent);
+            return true;
+        } catch (Exception e) {
+            Log.w(TAG, "openWithViewer failed: " + path, e);
+            return false;
+        }
+    }
+
     /** JS 来源的 pickFile: 挂起请求, 结果经 WebView 回调 window.bnyOnPick(path, canceled) */
     public void pickFileFromJs(String mime) {
         pendingPicks.add(new Pending(-1, null, webView));
-        launchPick(mime == null || mime.isEmpty() ? "*/*" : mime);
+        launchPick(mime == null || mime.isEmpty() ? "*/*" : mime, false);
     }
 
-    private void launchPick(final String mime) {
+    /** JS 来源的 pickFiles: 多选, 结果经 window.bnyOnPick({paths, canceled}) 回调 */
+    public void pickFilesFromJs(String mime) {
+        pendingPicks.add(new Pending(-1, null, webView, true));
+        launchPick(mime == null || mime.isEmpty() ? "*/*" : mime, true);
+    }
+
+    /** JS 来源的 pickImages: 相册多选, 结果经 window.bnyOnPick({paths, canceled}) 回调 */
+    public void pickImagesFromJs() {
+        pendingPicks.add(new Pending(-1, null, webView, true));
+        launchPick("image/*", true);
+    }
+
+    /** JS 来源的 openFile */
+    public void openFileFromJs(String path, String mime) {
+        openWithViewer(path, mime);
+    }
+
+    private void launchPick(final String mime, final boolean multiple) {
         final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mime);
+        if (multiple) {
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        }
+        final int code = multiple ? PICK_FILES_REQUEST : PICK_FILE_REQUEST;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    activity.startActivityForResult(intent, PICK_FILE_REQUEST);
+                    activity.startActivityForResult(intent, code);
                 } catch (Exception e) {
                     Log.w(TAG, "no handler for pickFile", e);
-                    bridgePickDone(null, true);
+                    bridgePickDone(new ArrayList<String>(), true);
                 }
             }
         });
     }
 
     /** Activity.onActivityResult 转发入口 */
-    public void onPickResult(String path, boolean canceled) {
-        bridgePickDone(path, canceled);
+    public void onPickResults(List<String> paths, boolean canceled) {
+        bridgePickDone(paths, canceled);
     }
 
-    private void bridgePickDone(String path, boolean canceled) {
+    private void bridgePickDone(List<String> paths, boolean canceled) {
         Pending p = pendingPicks.poll();
         if (p == null) {
             return;
         }
+        boolean empty = paths == null || paths.isEmpty();
         if (p.out != null) {
             // PHP socket 来源: 回写一行 JSON 并关闭
             try {
-                if (canceled || path == null) {
+                if (canceled || empty) {
                     writeLine(p.out, errJson(p.id, "cancelled").toString());
                 } else {
                     JSONObject data = new JSONObject();
-                    data.put("path", path);
+                    if (p.multi) {
+                        // 多选: data.paths 为路径数组
+                        JSONArray arr = new JSONArray();
+                        for (String s : paths) {
+                            arr.put(s);
+                        }
+                        data.put("paths", arr);
+                    } else {
+                        data.put("path", paths.get(0));
+                    }
                     JSONObject o = okJson(p.id);
                     o.put("data", data);
                     writeLine(p.out, o.toString());
@@ -434,12 +556,16 @@ public class BridgeServer {
                 Log.w(TAG, "pick write failed", e);
             }
         } else if (p.jsWebView != null) {
-            // JS 来源: 回调 window.bnyOnPick(path, canceled)
+            // JS 来源: 回调 window.bnyOnPick(res)
             final WebView wv = p.jsWebView;
             final String arg;
             try {
                 JSONObject a = new JSONObject();
-                a.put("path", canceled ? null : path);
+                if (p.multi) {
+                    a.put("paths", canceled ? new JSONArray() : new JSONArray(paths));
+                } else {
+                    a.put("path", canceled || empty ? JSONObject.NULL : paths.get(0));
+                }
                 a.put("canceled", canceled);
                 arg = a.toString();
             } catch (Exception e) {
