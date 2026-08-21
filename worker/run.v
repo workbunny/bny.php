@@ -24,8 +24,8 @@ pub fn run() ! {
 			for v in bny_conf.define {
 				args.prepend(['-d', v])
 			}
-			println(args)
 		}
+		println(args)
 		mut process := os.new_process(php_path)
 		process.set_args(args)
 		process.run()
